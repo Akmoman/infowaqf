@@ -517,10 +517,10 @@
 
     <!-- ================= الـ JavaScript التفاعلي وقاعدة البيانات السحابية ================= -->
     <script type="module">
-        // استيراد أدوات قاعدة البيانات السحابية بشكل آمن
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        // استيراد أدوات قاعدة البيانات السحابية بشكل آمن ومجرب وموحد
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
         // --- البيانات الأولية الافتراضية ---
         const initialRecords = [
@@ -562,7 +562,7 @@
 
         const baseYears = Array.from({length: 10}, (_, i) => 2026 + i);
 
-        // متغيرات الحالة الرئيسية
+        // متغيرات الحالة الرئيسية والوحيدة للتطبيق
         let state = {
             records: initialRecords.map(r => ({
                 ...r,
@@ -577,11 +577,12 @@
         let userRole = null; // 'admin' or 'public'
         let visitorName = '';
         let activeTab = 'dashboard';
-        let filterType = 'all'; // 'all', 'land', 'water'
+        let filterType = 'all'; 
         let selectedYear = 2026;
         let isSaving = false;
+        let currentUser = null;
 
-        // الاتصال السحابي
+        // تهيئة ثوابت الاتصال السحابي للغرفة البيئية البرمجية
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'manal-waqf-system';
         const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -604,9 +605,9 @@
             }
         }
 
-        // الحفظ التلقائي في السحابة
+        // الحفظ السحابي التلقائي
         async function syncToCloud() {
-            if (!db || !auth.currentUser) return;
+            if (!db || !currentUser) return; // حماية لضمان اكتمال المصادقة قبل الحفظ
             isSaving = true;
             setCloudStatus('synced');
             try {
@@ -627,7 +628,7 @@
             }
         }
 
-        // ================= تهيئة النظام والتحقق من السحابة =================
+        // ================= تهيئة ومزامنة قاعدة البيانات (اتباع دقيق للقواعد) =================
         window.addEventListener('DOMContentLoaded', () => {
             // ملء قائمة السنوات
             const yearSelect = document.getElementById('year-select');
@@ -645,6 +646,7 @@
 
                 setCloudStatus('connecting');
 
+                // المصادقة السحابية أولاً (Awaited)
                 const initAuth = async () => {
                     try {
                         if (initialToken) {
@@ -655,11 +657,14 @@
                     } catch (err) {
                         console.error("خطأ تسجيل الدخول السحابي:", err);
                         setCloudStatus('error');
+                        render();
                     }
                 };
 
+                // إطلاق المصادقة ثم المراقبة في الوقت الحقيقي
                 initAuth().then(() => {
                     onAuthStateChanged(auth, (user) => {
+                        currentUser = user;
                         if (user) {
                             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'state', 'main');
                             onSnapshot(docRef, (docSnap) => {
@@ -673,18 +678,24 @@
                                     setCloudStatus('synced');
                                     render();
                                 } else {
+                                    // كتابة الحالة الابتدائية لبلدة منال
                                     setDoc(docRef, {
                                         records: state.records,
                                         purposes: state.purposes,
                                         showNames: state.showNames,
                                         showPhones: state.showPhones,
                                         showPaymentsToPublic: state.showPaymentsToPublic
+                                    }).then(() => {
+                                        setCloudStatus('synced');
+                                        render();
+                                    }).catch((err) => {
+                                        console.error("خطأ تهيئة الحالة السحابية الأولى:", err);
                                     });
-                                    setCloudStatus('synced');
                                 }
                             }, (error) => {
-                                console.error(error);
+                                console.error("خطأ الاتصال السحابي لقراءة المستند:", error);
                                 setCloudStatus('error');
+                                render();
                             });
                         }
                     });
@@ -695,7 +706,7 @@
             }
         });
 
-        // ================= العمليات الحسابية الشاملة =================
+        // ================= العمليات الحسابية لمجمع الإيرادات =================
         const calculateSummary = () => {
             let totalRent = 0;
             let totalHours = 0;
@@ -724,7 +735,7 @@
             return { totalRent, totalHours, waterRent, landRent, asfalRent, asfalHours, seebRent, seebHours };
         };
 
-        // ================= واجهة المستخدم: رندرة وتحديث الشاشات =================
+        // ================= واجهة العرض التفاعلية ومكوناتها =================
         function render() {
             const sum = calculateSummary();
 
@@ -734,7 +745,7 @@
             document.getElementById('summary-water-rent').textContent = sum.waterRent;
             document.getElementById('summary-total-hours').textContent = sum.totalHours;
 
-            // النسب المئوية في لوحة المؤشرات
+            // حساب وتحديث تقدم الإحصاءات
             const landPct = sum.totalRent > 0 ? ((sum.landRent / sum.totalRent) * 100).toFixed(1) : 0;
             const waterPct = sum.totalRent > 0 ? ((sum.waterRent / sum.totalRent) * 100).toFixed(1) : 0;
 
@@ -751,15 +762,16 @@
             document.getElementById('summary-seeb-hours').textContent = `${sum.seebHours} ساعات ماء`;
             document.getElementById('summary-seeb-rent').textContent = `${sum.seebRent} ر.ع`;
 
-            // 2. تحديث شريط وتسميات الإدارة / الزائر
+            // 2. تحديث الترويسة حسب مستويات الصلاحيات المفتوحة
             const badge = document.getElementById('badge-role');
             const welcome = document.getElementById('welcome-message');
+            
             if (userRole === 'admin') {
                 badge.textContent = 'صلاحية مسؤول';
                 badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-amber-400 text-slate-900";
-                welcome.textContent = 'لوحة تحكم إدارية كاملة للأصول والأملاك الوقفية';
+                welcome.textContent = 'لوحة تحكم إدارية كاملة للأصول والأملاك الوقفية لبلدة منال';
                 
-                // إظهار الأدوات والتحكم الخاص بالمسؤول
+                // تفعيل شاشات المسؤول بالكامل
                 document.getElementById('admin-add-form-container').classList.remove('hidden');
                 document.getElementById('admin-toggles-container').classList.remove('hidden');
                 document.getElementById('th-phone').classList.remove('hidden');
@@ -774,11 +786,11 @@
                 badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-600 text-white";
                 welcome.textContent = `مرحباً بك${visitorName ? ` الفاضل/ ${visitorName}` : ''}، واجهة عرض الأهالي والزوار للقراءة`;
 
-                // إخفاء أدوات المسؤول
+                // تعطيل وإخفاء شاشات المسؤول
                 document.getElementById('admin-add-form-container').classList.add('hidden');
                 document.getElementById('admin-toggles-container').classList.add('hidden');
                 
-                // التحكم بالأعمدة حسب إعداد المسؤول
+                // تعديل عرض الأعمدة بحسب خيارات العرض السحابية المقررة من المسؤول
                 if (state.showPhones) {
                     document.getElementById('th-phone').classList.remove('hidden');
                 } else {
@@ -800,17 +812,17 @@
                 document.getElementById('public-distribution-view').classList.remove('hidden');
             }
 
-            // تحديث أزرار خيارات العرض العلوية للإدارة للتناسق مع الحالة
+            // تحديث تصميم أزرار الخيارات الإدارية
             updateToggleButtonsStyle();
 
-            // 3. رندرة جدول العقود (سجل الآجار)
+            // 3. رندرة قائمة وجدول العقود
             renderLedgerTable(sum.totalRent);
 
-            // 4. رندرة حاسبة الأوقاف وتوزيع الحصص
+            // 4. رندرة التوزيع والحصص المخصصة في الحاسبة
             renderDistributionSection(sum.totalRent);
         }
 
-        // تحديث أشكال أزرار التحكم في عرض الجمهور
+        // تحديث أزرار خيارات العرض للجمهور وتثبيتها سحابياً
         function updateToggleButtonsStyle() {
             if (userRole !== 'admin') return;
             const toggleNames = document.getElementById('toggle-names');
@@ -827,7 +839,7 @@
             togglePayments.innerHTML = `<i class="fa-solid ${state.showPaymentsToPublic ? 'fa-eye' : 'fa-eye-slash'}"></i> حالة الدفع`;
         }
 
-        // بناء صفوف جدول العقود بشكل تفاعلي
+        // بناء صفوف الجدول ببيانات دقيقة ومفلترة
         function renderLedgerTable(totalRent) {
             const tableBody = document.getElementById('ledger-table-body');
             tableBody.innerHTML = '';
@@ -853,7 +865,7 @@
                 tdType.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${record.type === 'land' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">${record.type === 'land' ? 'أرض/عقار' : 'مياه وسقي'}</span>`;
                 tr.appendChild(tdType);
 
-                // اسم المستأجر (مشروط بالإعدادات)
+                // اسم المستأجر (مشروط بالحماية)
                 const tdTenant = document.createElement('td');
                 tdTenant.className = "px-6 py-4 text-slate-600 font-semibold";
                 if (userRole === 'admin' || state.showNames) {
@@ -895,7 +907,7 @@
                 tdDuration.textContent = record.duration;
                 tr.appendChild(tdDuration);
 
-                // حالة الدفع (تظهر للمسؤول دائماً، وتظهر للعامة بناءً على الإعدادات)
+                // حالة الدفع للسنوات
                 if (userRole === 'admin' || state.showPaymentsToPublic) {
                     const tdPayment = document.createElement('td');
                     tdPayment.className = "px-6 py-4 text-center";
@@ -903,9 +915,9 @@
 
                     if (userRole === 'admin') {
                         const btnPay = document.createElement('button');
-                        btnPay.onclick = () => togglePayment(record.id);
                         btnPay.className = `inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isPaid ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}`;
                         btnPay.innerHTML = `<i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}`;
+                        btnPay.onclick = () => window.togglePayment(record.id);
                         tdPayment.appendChild(btnPay);
                     } else {
                         tdPayment.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold ${isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-600 border border-red-200'}"><i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}</span>`;
@@ -913,26 +925,26 @@
                     tr.appendChild(tdPayment);
                 }
 
-                // تنبيه واتساب (للمسؤول فقط)
+                // تنبيه واتساب
                 if (userRole === 'admin') {
                     const tdWhatsapp = document.createElement('td');
                     tdWhatsapp.className = "px-6 py-4 text-center";
                     const isPaid = record.payments && record.payments[selectedYear];
                     
                     const btnWa = document.createElement('button');
-                    btnWa.onclick = () => sendWhatsApp(record);
                     btnWa.disabled = isPaid;
                     btnWa.className = `inline-flex items-center justify-center p-2 rounded-full transition-all ${isPaid ? 'text-slate-300 cursor-not-allowed' : 'text-green-600 hover:bg-green-50 hover:text-green-700'}`;
                     btnWa.innerHTML = `<i class="fa-solid fa-comment text-lg"></i>`;
+                    btnWa.onclick = () => window.sendWhatsApp(record);
                     tdWhatsapp.appendChild(btnWa);
                     tr.appendChild(tdWhatsapp);
                 }
 
-                // حذف العقد (للمسؤول فقط)
+                // حذف العقد
                 if (userRole === 'admin') {
                     const tdDel = document.createElement('td');
                     tdDel.className = "px-6 py-4 text-center";
-                    tdDel.innerHTML = `<button onclick="deleteContract(${record.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors" title="حذف هذا العقد"><i class="fa-solid fa-trash-can"></i></button>`;
+                    tdDel.innerHTML = `<button onclick="window.deleteContract(${record.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors" title="حذف هذا العقد"><i class="fa-solid fa-trash-can"></i></button>`;
                     tr.appendChild(tdDel);
                 }
 
@@ -940,9 +952,8 @@
             });
         }
 
-        // بناء تبويب حاسبة تقسيم الأوقاف
+        // بناء حاسبة التوزيع والحصص التلقائية
         function renderDistributionSection(totalRent) {
-            // تحديث البطاقة الجانبية ومبالغها
             document.getElementById('dist-card-total').textContent = totalRent;
             document.getElementById('distribution-total-text').textContent = `${totalRent} ر.ع`;
 
@@ -959,7 +970,7 @@
             }
             distProgress.style.width = `${Math.min(totalPct, 100)}%`;
 
-            // ملء القائمة الإجمالية الجانبية للحصص
+            // بناء البطاقة الجانبية للتوزيع المالي
             const sharesList = document.getElementById('dist-card-shares-list');
             sharesList.innerHTML = '';
             state.purposes.forEach(p => {
@@ -976,10 +987,9 @@
                 sharesList.appendChild(div);
             });
 
-            // تحديث قيمة التذييل بالبطاقة
             document.getElementById('dist-card-sum-val').textContent = `${totalRent.toFixed(2)} ر.ع`;
 
-            // بناء واجهة الإدخال للمسؤول (قائمة التعديل)
+            // بناء واجهة الإدارة (تعديل الأغراض والنسب)
             const adminPurposesList = document.getElementById('admin-purposes-list');
             adminPurposesList.innerHTML = '';
             state.purposes.forEach(purpose => {
@@ -988,14 +998,14 @@
                 div.innerHTML = `
                     <div class="flex-1">
                       <label class="block text-xs text-slate-500 mb-1 font-bold">اسم المصرف / الغرض</label>
-                      <input type="text" value="${purpose.name}" onchange="updatePurposeName(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                      <input type="text" value="${purpose.name}" onchange="window.updatePurposeName(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
                     </div>
                     <div class="w-24">
                       <label class="block text-xs text-slate-500 mb-1 font-bold">النسبة (%)</label>
-                      <input type="number" value="${purpose.percent}" onchange="updatePurposePercent(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800" min="0" max="100">
+                      <input type="number" value="${purpose.percent}" onchange="window.updatePurposePercent(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800" min="0" max="100">
                     </div>
                     <div class="pt-5">
-                      <button onclick="deletePurpose(${purpose.id})" class="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50" title="حذف المصرف">
+                      <button onclick="window.deletePurpose(${purpose.id})" class="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50" title="حذف المصرف">
                         <i class="fa-solid fa-trash-can text-lg"></i>
                       </button>
                     </div>
@@ -1003,7 +1013,7 @@
                 adminPurposesList.appendChild(div);
             });
 
-            // بناء واجهة العرض العامة (مخططات ملونة للجمهور)
+            // بناء واجهة الأهالي (مخططات العرض والشفافية)
             const publicPurposesBars = document.getElementById('public-purposes-bars');
             publicPurposesBars.innerHTML = '';
             state.purposes.forEach(p => {
@@ -1026,9 +1036,8 @@
             });
         }
 
-        // ================= مهام ووظائف التحكم من الجافا سكريبت =================
+        // ================= مهام ووظائف التحكم - لربطها بـ HTML =================
 
-        // شاشات الدخول والتبديل
         window.showPublicLogin = function() {
             document.getElementById('gate-screen').classList.add('hidden');
             document.getElementById('public-login-screen').classList.remove('hidden');
@@ -1075,10 +1084,8 @@
             document.getElementById('visitor-name-input').value = '';
         };
 
-        // تبديل التبويبات الثلاثة
         window.switchTab = function(tabId) {
             activeTab = tabId;
-            // إخفاء الكل أولاً
             document.getElementById('tab-dashboard-content').classList.add('hidden');
             document.getElementById('tab-ledger-content').classList.add('hidden');
             document.getElementById('tab-distribution-content').classList.add('hidden');
@@ -1087,34 +1094,37 @@
             document.getElementById('btn-tab-ledger').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
             document.getElementById('btn-tab-distribution').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
 
-            // إظهار التبويب المطلوب
             document.getElementById(`tab-${tabId}-content`).classList.remove('hidden');
             document.getElementById(`btn-tab-${tabId}`).className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-emerald-700 border-b-2 border-emerald-700 bg-emerald-50/50";
         };
 
-        // فلاتر جدول سجل العقود
         window.setFilter = function(type) {
             filterType = type;
             document.getElementById('btn-filter-all').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
             document.getElementById('btn-filter-land').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
             document.getElementById('btn-filter-water').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
 
-            document.getElementById(`btn-filter-${type}`).className = "px-3 py-1.5 rounded-md transition-all bg-white text-emerald-800 shadow-sm";
+            document.getElementById(`btn-filter-${type}`).className = "px-3 py-1.5 rounded-md transition-all bg-white text-emerald-800 shadow-sm font-bold";
             render();
         };
 
-        // تغيير السنة المختارة من القائمة المنسدلة
         window.changeSelectedYear = function() {
             selectedYear = Number(document.getElementById('year-select').value);
             render();
         };
 
-        // تفعيل خيارات العرض العلوية من الإدارة
         window.handleToggleOption = function(type) {
-            handleToggleOption(type);
+            if (type === 'names') {
+                state.showNames = !state.showNames;
+            } else if (type === 'phones') {
+                state.showPhones = !state.showPhones;
+            } else if (type === 'payments') {
+                state.showPaymentsToPublic = !state.showPaymentsToPublic;
+            }
+            render();
+            syncToCloud();
         };
 
-        // تفعيل دفع العقار
         window.togglePayment = function(id) {
             state.records = state.records.map(rec => {
                 if (rec.id === id) {
@@ -1133,14 +1143,12 @@
             syncToCloud();
         };
 
-        // حذف العقد من الجدول
         window.deleteContract = function(id) {
             state.records = state.records.filter(r => r.id !== id);
             render();
             syncToCloud();
         };
 
-        // إرسال تنبيه الدفع عبر الواتساب
         window.sendWhatsApp = function(record) {
             const phone = record.phone.startsWith('9') || record.phone.startsWith('7') ? `968${record.phone}` : record.phone;
             const typeLabel = record.type === 'land' ? 'أرض/عقار الوقف' : 'مياه سقي الفلج';
@@ -1149,7 +1157,6 @@
             window.open(url, '_blank');
         };
 
-        // فتح وإغلاق قائمة استمارة إضافة العقد
         window.toggleAddForm = function() {
             const formBody = document.getElementById('add-form-body');
             const label = document.getElementById('add-form-toggle-label');
@@ -1162,7 +1169,6 @@
             }
         };
 
-        // تغيير مخرجات استمارة إضافة العقد حسب نوع الوقف مياه أو أراضي
         window.toggleFormWaterFields = function() {
             const type = document.getElementById('form-type').value;
             const falajContainer = document.getElementById('form-water-falaj-container');
@@ -1176,7 +1182,6 @@
             }
         };
 
-        // حفظ العقد الجديد
         window.saveNewContract = function() {
             const type = document.getElementById('form-type').value;
             const name = document.getElementById('form-name').value.trim();
@@ -1209,7 +1214,7 @@
             state.records.push(newContract);
             render();
             syncToCloud();
-            toggleAddForm();
+            window.toggleAddForm();
 
             // تنظيف الحقول
             document.getElementById('form-name').value = '';
@@ -1220,7 +1225,6 @@
             document.getElementById('form-hours').value = '';
         };
 
-        // تعديل تفاصيل مصارف الأوقاف في التوزيع (الأسماء)
         window.updatePurposeName = function(id, val) {
             state.purposes = state.purposes.map(p => {
                 if (p.id === id) {
@@ -1232,7 +1236,6 @@
             syncToCloud();
         };
 
-        // تعديل تفاصيل مصارف الأوقاف في التوزيع (النسب)
         window.updatePurposePercent = function(id, val) {
             state.purposes = state.purposes.map(p => {
                 if (p.id === id) {
@@ -1244,14 +1247,12 @@
             syncToCloud();
         };
 
-        // حذف مصرف من القائمة
         window.deletePurpose = function(id) {
             state.purposes = state.purposes.filter(p => p.id !== id);
             render();
             syncToCloud();
         };
 
-        // إضافة مصرف جديد
         window.addWaqfPurpose = function() {
             const newId = state.purposes.length > 0 ? Math.max(...state.purposes.map(p => p.id)) + 1 : 1;
             state.purposes.push({ id: newId, name: 'مصرف جديد', percent: 0 });
