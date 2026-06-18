@@ -174,12 +174,15 @@
 
         <!-- تنبيه الوضع المحلي المؤقت -->
         <div id="local-mode-alert" class="hidden container mx-auto px-4 mt-6">
-            <div class="bg-amber-50 border border-amber-200 text-amber-800 px-5 py-4 rounded-xl flex items-center justify-between text-sm font-semibold shadow-sm">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-circle-info text-amber-600 text-xl"></i>
-                    <span>أنت تعمل الآن في <strong>الوضع المحلي المؤقت</strong>. يرجى التأكد من تفعيل "ميزة الدخول المجهول Anonymous" وإنشاء قاعدة بيانات "Firestore Database" في لوحة تحكم مشروع Firebase الخاص بك لتبدأ المزامنة السحابية.</span>
+            <div class="bg-red-50 border border-red-200 text-red-800 px-5 py-4 rounded-xl flex items-start justify-between text-sm shadow-sm">
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl mt-0.5"></i>
+                    <div>
+                        <span class="font-bold block mb-1">الربط السحابي لا يعمل! أنت في الوضع المحلي المؤقت.</span>
+                        <span id="error-text-span" class="text-xs font-semibold leading-relaxed">يرجى التأكد من إعدادات Firebase الخاصة بك.</span>
+                    </div>
                 </div>
-                <button onclick="document.getElementById('local-mode-alert').classList.add('hidden')" class="text-amber-500 hover:text-amber-800 transition-colors mr-4">
+                <button onclick="document.getElementById('local-mode-alert').classList.add('hidden')" class="text-red-500 hover:text-red-800 transition-colors mr-4 shrink-0">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -200,9 +203,9 @@
                             <i class="fa-solid fa-chart-line text-2xl text-emerald-300"></i>
                         </div>
                         <div class="relative z-10">
-                            <p className="text-sm text-emerald-100 font-medium">الإجمالي العام السنوي</p>
-                            <h3 className="text-3xl font-extrabold mt-1"><span id="summary-total-rent">0</span> <span class="text-sm font-normal text-emerald-200">ر.ع</span></h3>
-                            <p class="text-xs text-emerald-200 mt-2">المياه + العقارات والأراضي</p>
+                            <p class="text-sm text-emerald-100 font-medium">الإجمالي العام السنوي</p>
+                            <h3 class="text-3xl font-extrabold mt-1"><span id="summary-total-rent">0</span> <span class="text-sm font-normal text-emerald-200">ر.ع</span></h3>
+                            <p class="text-xs text-emerald-200 mt-2">عقود الإيجار + عقود الاستثمار</p>
                         </div>
                     </div>
 
@@ -212,7 +215,7 @@
                             <i class="fa-solid fa-map-location-dot text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">إيرادات الأراضي المستثمرة</p>
+                            <p class="text-sm text-slate-500 font-medium">عقود الاستثمار (أراضي وعقارات)</p>
                             <h3 class="text-2xl font-bold text-indigo-700 mt-1"><span id="summary-land-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
                             <p class="text-xs text-slate-400 mt-1">القطع السكنية والتجارية والزراعية</p>
                         </div>
@@ -224,7 +227,7 @@
                             <i class="fa-solid fa-droplet text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">إيرادات أوقاف المياه</p>
+                            <p class="text-sm text-slate-500 font-medium">عقود الإيجار (أوقاف المياه)</p>
                             <h3 class="text-2xl font-bold text-emerald-700 mt-1"><span id="summary-water-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
                             <p class="text-xs text-slate-400 mt-1">آجار سقي الأفلاج السنوي</p>
                         </div>
@@ -252,7 +255,7 @@
                         <div class="space-y-6">
                             <div>
                                 <div class="flex justify-between text-sm mb-1.5 font-semibold">
-                                    <span class="flex items-center gap-2"><i class="fa-solid fa-map text-indigo-500"></i> الأراضي والعقارات المستثمرة</span>
+                                    <span class="flex items-center gap-2"><i class="fa-solid fa-map text-indigo-500"></i> عقود الاستثمار (أراضي وعقارات)</span>
                                     <span id="land-rent-percent" class="font-bold text-indigo-700">0%</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-3">
@@ -263,7 +266,7 @@
 
                             <div>
                                 <div class="flex justify-between text-sm mb-1.5 font-semibold">
-                                    <span class="flex items-center gap-2"><i class="fa-solid fa-droplet text-emerald-500"></i> أوقاف سقي المياه (الأفلاج)</span>
+                                    <span class="flex items-center gap-2"><i class="fa-solid fa-droplet text-emerald-500"></i> عقود الإيجار (أوقاف المياه)</span>
                                     <span id="water-rent-percent" class="font-bold text-emerald-700">0%</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-3">
@@ -320,8 +323,8 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">نوع الاستثمار الوقفي</label>
                                 <select id="form-type" onchange="toggleFormWaterFields()" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                    <option value="land">أرض / عقار استثماري</option>
-                                    <option value="water">مياه أفلاج وسقي</option>
+                                    <option value="land">عقد استثمار (أرض / عقار)</option>
+                                    <option value="water">عقد إيجار (مياه أفلاج)</option>
                                 </select>
                             </div>
 
@@ -382,8 +385,8 @@
                         <!-- مفتاح التصفية -->
                         <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold">
                             <button onclick="setFilter('all')" id="btn-filter-all" class="px-3 py-1.5 rounded-md transition-all bg-white text-emerald-800 shadow-sm">الكل</button>
-                            <button onclick="setFilter('land')" id="btn-filter-land" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">أراضي وعقارات</button>
-                            <button onclick="setFilter('water')" id="btn-filter-water" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">أوقاف مياه</button>
+                            <button onclick="setFilter('land')" id="btn-filter-land" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">عقود الاستثمار</button>
+                            <button onclick="setFilter('water')" id="btn-filter-water" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">عقود الإيجار</button>
                         </div>
 
                         <!-- أدوات التحكم في العرض وقائمة السنوات -->
@@ -457,16 +460,22 @@
                                     </button>
                                 </div>
 
-                                <div id="percentage-alert" class="hidden mb-6 p-4 bg-red-50 text-red-700 rounded-lg flex items-start gap-3 border border-red-100">
-                                    <i class="fa-solid fa-triangle-exclamation text-xl shrink-0"></i>
+                                <div id="percentage-alert" class="hidden mb-6 p-4 bg-red-50 text-red-700 rounded-lg flex items-start gap-3 border border-red-100 shadow-sm">
+                                    <i class="fa-solid fa-triangle-exclamation text-xl shrink-0 mt-0.5"></i>
                                     <div>
                                         <p class="font-bold">تنبيه: مجموع النسب لا يساوي 100%</p>
-                                        <p class="text-sm mt-1 font-medium">يرجى تعديل النسب لتساوي 100% لضمان صحة توزيع أموال الأوقاف.</p>
+                                        <p class="text-sm mt-1 font-medium">المجموع الحالي هو <span id="current-total-percent-alert" class="font-bold text-lg underline">0</span>%. يرجى التعديل ليصبح المجموع 100% بالضبط لضمان دقة التوزيع.</p>
                                     </div>
                                 </div>
 
                                 <div id="admin-purposes-list" class="space-y-4">
                                     <!-- سيتم ملؤه ديناميكياً بالحقول القابلة للتعديل -->
+                                </div>
+                                
+                                <!-- شريط يوضح المجموع الكلي أسفل القائمة -->
+                                <div id="total-percent-container" class="mt-4 p-4 rounded-lg flex justify-between items-center border font-bold text-lg bg-slate-50 border-slate-200">
+                                    <span>مجموع النسب المئوية:</span>
+                                    <span id="total-percent-value" class="text-xl">0%</span>
                                 </div>
                             </div>
 
@@ -484,7 +493,7 @@
                                 </div>
 
                                 <div class="mt-6 p-4 bg-emerald-50/50 rounded-lg text-xs text-emerald-800 border border-emerald-100/50 leading-relaxed font-medium">
-                                    * تُحسب المبالغ الموزعة أعلاه ديناميكياً وتلقائياً بناءً على إجمالي عقود الأوقاف والآجارات النشطة البالغة <strong id="distribution-total-text">0 ر.ع</strong> (تجمع بين مياه سقي الفلج والأراضي المستثمرة) وبحسب النسب المقررة من لجنة الأوقاف.
+                                    * تُحسب المبالغ الموزعة أعلاه ديناميكياً وتلقائياً بناءً على إجمالي عقود الأوقاف والآجارات النشطة البالغة <strong id="distribution-total-text">0 ر.ع</strong> (تجمع بين عقود الإيجار وعقود الاستثمار) وبحسب النسب المقررة من لجنة الأوقاف.
                                 </div>
                             </div>
 
@@ -530,10 +539,10 @@
 
     <!-- ================= الـ JavaScript التفاعلي وقاعدة البيانات السحابية ================= -->
     <script type="module">
-        // استيراد أدوات قاعدة البيانات السحابية المحدثة للإصدار المستقر والمثالي 10.8.0
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        // استيراد أدوات قاعدة البيانات السحابية المحدثة للإصدار الأحدث
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         // --- البيانات الأولية الافتراضية ---
         const initialRecords = [
@@ -613,9 +622,10 @@
         const db = getFirestore(app);
 
         // دالة تحديث مؤشر الاتصال السحابي والتنبيهات الفرعية
-        function setCloudStatus(status) {
+        function setCloudStatus(status, errorMessage = '') {
             const indicator = document.getElementById('cloud-indicator');
             const localAlert = document.getElementById('local-mode-alert');
+            const errorTextSpan = document.getElementById('error-text-span');
             if (!indicator) return;
             
             if (status === 'connecting') {
@@ -627,9 +637,18 @@
                 indicator.className = "flex items-center gap-2 text-xs font-bold text-emerald-300";
                 if (localAlert) localAlert.classList.add('hidden');
             } else if (status === 'error' || status === 'local') {
-                indicator.innerHTML = `<i class="fa-solid fa-cloud-meatball"></i> وضع محلي مؤقت`;
-                indicator.className = "flex items-center gap-2 text-xs font-bold text-slate-300";
-                if (localAlert) localAlert.classList.remove('hidden');
+                indicator.innerHTML = `<i class="fa-solid fa-cloud-meatball"></i> خطأ بالاتصال`;
+                indicator.className = "flex items-center gap-2 text-xs font-bold text-red-300";
+                if (localAlert) {
+                    localAlert.classList.remove('hidden');
+                    if (errorMessage && errorTextSpan) {
+                        errorTextSpan.innerHTML = `<strong class="text-red-700">رسالة الخطأ:</strong> <span dir="ltr" class="inline-block text-red-600 font-mono text-xs bg-red-100 px-1 rounded">${errorMessage}</span><br/><br/>
+                        <strong class="text-slate-800">لحل المشكلة، تأكد من 3 أشياء في لوحة تحكم Firebase:</strong><br/>
+                        <span class="text-slate-700">1. تفعيل <b>Firestore Database</b>.</span><br/>
+                        <span class="text-slate-700">2. تفعيل الدخول المجهول <b>Anonymous</b> في (Authentication -> Sign-in method).</span><br/>
+                        <span class="text-slate-700">3. <b>الأهم (إذا كنت على GitHub):</b> إضافة رابط موقعك <span dir="ltr" class="text-xs bg-white px-1">.github.io</span> في قائمة <b>Authorized domains</b> داخل إعدادات Authentication.</span>`;
+                    }
+                }
             }
         }
 
@@ -651,7 +670,7 @@
                 setCloudStatus('synced');
             } catch (error) {
                 console.error("فشل المزامنة السحابية:", error);
-                setCloudStatus('error');
+                setCloudStatus('error', error.message);
             } finally {
                 isSaving = false;
             }
@@ -676,7 +695,7 @@
                     await signInAnonymously(auth);
                 } catch (err) {
                     console.error("خطأ الدخول المجهول لـ Firebase:", err);
-                    setCloudStatus('error');
+                    setCloudStatus('error', err.message);
                     render();
                 }
             };
@@ -710,15 +729,16 @@
                                     render();
                                 }).catch((err) => {
                                     console.error("خطأ إعداد المستند السحابي الأساسي:", err);
+                                    setCloudStatus('error', err.message);
                                 });
                             }
                         }, (error) => {
                             console.error("خطأ قراءة مستند Firestore:", error);
-                            setCloudStatus('error');
+                            setCloudStatus('error', error.message);
                             render();
                         });
                     } else {
-                        setCloudStatus('error');
+                        // No logic needed here
                     }
                 });
             });
@@ -880,7 +900,7 @@
                 // النوع
                 const tdType = document.createElement('td');
                 tdType.className = "px-6 py-4";
-                tdType.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${record.type === 'land' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">${record.type === 'land' ? 'أرض/عقار' : 'مياه وسقي'}</span>`;
+                tdType.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${record.type === 'land' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">${record.type === 'land' ? 'عقد استثمار' : 'عقد إيجار'}</span>`;
                 tr.appendChild(tdType);
 
                 // اسم المستأجر (مشروط بالحماية)
@@ -978,15 +998,23 @@
             const totalPct = state.purposes.reduce((acc, p) => acc + p.percent, 0);
             const distProgress = document.getElementById('dist-card-progress');
             const alertBox = document.getElementById('percentage-alert');
+            const alertVal = document.getElementById('current-total-percent-alert');
+            const totalContainer = document.getElementById('total-percent-container');
+            const totalValue = document.getElementById('total-percent-value');
 
             if (totalPct === 100) {
                 distProgress.className = "h-1.5 rounded-full bg-emerald-400";
                 alertBox.classList.add('hidden');
+                totalContainer.className = "mt-4 p-4 rounded-lg flex justify-between items-center border font-bold text-lg bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm";
+                totalValue.className = "text-emerald-700 text-xl";
             } else {
                 distProgress.className = "h-1.5 rounded-full bg-red-400";
                 alertBox.classList.remove('hidden');
+                if (alertVal) alertVal.textContent = totalPct;
+                totalContainer.className = "mt-4 p-4 rounded-lg flex justify-between items-center border font-bold text-lg bg-red-50 border-red-300 text-red-800 shadow-sm";
+                totalValue.className = "text-red-700 text-xl";
             }
-            distProgress.style.width = `${Math.min(totalPct, 100)}%`;
+            totalValue.textContent = totalPct + '%';
 
             // بناء البطاقة الجانبية للتوزيع المالي
             const sharesList = document.getElementById('dist-card-shares-list');
@@ -998,10 +1026,12 @@
                 div.innerHTML = `
                     <span class="text-emerald-50 flex items-center gap-2 font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                        ${p.name} (${p.percent}%)
+                        ${p.name} (${p.percent})
                     </span>
                     <span class="font-extrabold">${amount} ر.ع</span>
                 `;
+                // تجنب أي خلل وتصحيح كتابة اسم المصرف والنسبة المئوية
+                div.querySelector('span').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> ${p.name} (${p.percent}%)`;
                 sharesList.appendChild(div);
             });
 
@@ -1169,7 +1199,7 @@
 
         window.sendWhatsApp = function(record) {
             const phone = record.phone.startsWith('9') || record.phone.startsWith('7') ? `968${record.phone}` : record.phone;
-            const typeLabel = record.type === 'land' ? 'أرض/عقار الوقف' : 'مياه سقي الفلج';
+            const typeLabel = record.type === 'land' ? 'عقد استثمار' : 'عقد إيجار';
             const message = `السلام عليكم الفاضل/ ${record.tenant}،\n\nنود تذكيركم بضرورة دفع الآجار السنوي لوقف (${typeLabel}: ${record.name}) لعام ${selectedYear} والبالغ (${record.rent} ر.ع).\n\nنرجو التكرم بالدفع لخدمة بيوت الله والبلدة، وجزاكم الله خيراً وحفظكم الله.`;
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
