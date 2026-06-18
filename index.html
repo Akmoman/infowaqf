@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة أوقاف مساجد بلدة منال</title>
+    <!-- Tailwind CSS لجمال وتنسيق الشاشات -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome للأيقونات الفاخرة -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- إعداد خط تاج مريح ومناسب -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-emerald-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- شاشة البوابة الرئيسية (Landing / Gate Screen) -->
+    <div id="gate-screen" class="flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
+        <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-emerald-700/30 animate-fade-in">
+            <div class="bg-emerald-950 p-8 text-center border-b border-emerald-800 text-white relative">
+                <i class="fa-solid fa-mosque text-5xl text-emerald-400 mb-3"></i>
+                <h1 class="text-3xl font-black tracking-tight">أوقاف مساجد بلدة منال</h1>
+                <p class="text-emerald-300 text-sm mt-2 font-medium">البوابة الإلكترونية السحابية لإدارة ومتابعة الأموال الوقفية للبلدة</p>
+            </div>
+
+            <div class="p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50">
+                <!-- بطاقة الأهالي والمستأجرين -->
+                <div class="bg-white rounded-xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-users text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800">بوابة الأهالي والمستأجرين</h3>
+                        <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                            مخصصة لأهالي بلدة منال الكرام والمستأجرين للاطلاع على كشوفات الآجار السنوية، وحالة الدفع المعتمدة، وتفاصيل تقسيم الأموال الوقفية بكل شفافية.
+                        </p>
+                    </div>
+                    <button onclick="showPublicLogin()" class="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all text-sm">
+                        دخول الأهالي والجمهور <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- بطاقة الإدارة ونظار الوقف -->
+                <div class="bg-white rounded-xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-lock text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800">بوابة الإدارة ونظّار الوقف</h3>
+                        <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                            شاشة تحكم خاصة بأعضاء لجنة أوقاف المساجد لتسجيل الاستثمارات الجديدة، وتحديث حالات الدفع، وتعديل نسب توزيع الحاسبة، وإرسال تنبيهات السداد.
+                        </p>
+                    </div>
+                    <button onclick="showAdminLogin()" class="w-full mt-6 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all text-sm">
+                        تسجيل دخول الإدارة <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-slate-100 px-6 py-4 text-center text-xs text-slate-500 border-t border-slate-200 font-semibold">
+                النظام مرتبط ومؤمن سحابياً بشكل دوري وتلقائي
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة دخول الإدارة (كلمة المرور) -->
+    <div id="admin-login-screen" class="hidden flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 p-6 text-center text-white">
+                <i class="fa-solid fa-shield-halved text-4xl text-amber-400 mb-2"></i>
+                <h2 class="text-xl font-bold">بوابة نظار الوقف المعتمدة</h2>
+                <p class="text-xs text-slate-400 mt-1 font-medium">يرجى إدخال الرقم السري لتفعيل لوحة التحكم</p>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="admin-auth-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i> الرمز السري غير صحيح. يرجى المحاولة مرة أخرى.
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">الرقم السري للإدارة</label>
+                  <input type="password" id="admin-password-input" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
+                </div>
+                <button onclick="submitAdminLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-lg text-sm transition-all">
+                  تأكيد الدخول الآمن
+                </button>
+                <button onclick="backToGate()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-all">
+                  رجوع للبوابة الرئيسية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة دخول الناس والأهالي -->
+    <div id="public-login-screen" class="hidden flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-emerald-900 p-6 text-center text-white">
+                <i class="fa-solid fa-users text-4xl text-emerald-300 mb-2"></i>
+                <h2 class="text-xl font-bold">بوابة أهالي بلدة منال الكرام</h2>
+                <p class="text-xs text-emerald-200 mt-1 font-medium">مرحباً بكم في نظام العرض المالي والآجارات</p>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">الاسم الكريم (اختياري للترحيب بك)</label>
+                  <input type="text" id="visitor-name-input" placeholder="مثال: أحمد بن ناصر الراشدي" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+                </div>
+                <button onclick="submitPublicLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-lg text-sm transition-all">
+                  الدخول المباشر للبرنامج
+                </button>
+                <button onclick="backToGate()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-all">
+                  رجوع للبوابة الرئيسية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي (بعد تسجيل الدخول) -->
+    <div id="app-screen" class="hidden flex-1 flex flex-col justify-between animate-fade-in">
+        <!-- ترويسة التطبيق الرئيسي -->
+        <header class="bg-emerald-800 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-5">
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-mosque text-3xl text-emerald-300"></i>
+                  <div>
+                    <h1 class="text-xl font-black tracking-tight flex items-center gap-2">
+                      نظام أوقاف مساجد بلدة منال
+                      <span id="badge-role" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </h1>
+                    <p id="welcome-message" class="text-emerald-200 text-xs mt-0.5 font-medium"></p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                  <!-- مؤشر الاتصال السحابي -->
+                  <div class="flex items-center gap-2 bg-emerald-900/50 px-3 py-1.5 rounded-lg border border-emerald-700">
+                    <span id="cloud-indicator" class="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                        <i class="fa-solid fa-sync animate-spin"></i> جاري الاتصال...
+                    </span>
+                  </div>
+                  <!-- زر تسجيل الخروج -->
+                  <button onclick="handleLogout()" class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-black transition-all shadow-md shrink-0">
+                    <i class="fa-solid fa-sign-out-alt"></i> الخروج للبوابة
+                  </button>
+                </div>
+              </div>
+            </div>
+        </header>
+
+        <!-- شريط التصفح والتبويبات -->
+        <nav class="bg-white border-b shadow-sm">
+            <div class="container mx-auto px-4">
+              <div class="flex gap-1 overflow-x-auto hide-scrollbar">
+                <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-emerald-700 border-b-2 border-emerald-700 bg-emerald-50/50">
+                  <i class="fa-solid fa-chart-pie"></i> لوحة المؤشرات العامة
+                </button>
+                <button onclick="switchTab('ledger')" id="btn-tab-ledger" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
+                  <i class="fa-solid fa-list-check"></i> سجل الآجار والعقود المشترك
+                </button>
+                <button onclick="switchTab('distribution')" id="btn-tab-distribution" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
+                  <i class="fa-solid fa-calculator"></i> حاسبة تقسيم الأوقاف
+                </button>
+              </div>
+            </div>
+        </nav>
+
+        <!-- تنبيه الوضع المحلي المؤقت -->
+        <div id="local-mode-alert" class="hidden container mx-auto px-4 mt-6">
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 px-5 py-4 rounded-xl flex items-center justify-between text-sm font-semibold shadow-sm">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-amber-600 text-xl"></i>
+                    <span>أنت تعمل الآن في <strong>الوضع المحلي المؤقت</strong>. يرجى التأكد من تفعيل "ميزة الدخول المجهول Anonymous" وإنشاء قاعدة بيانات "Firestore Database" في لوحة تحكم مشروع Firebase الخاص بك لتبدأ المزامنة السحابية.</span>
+                </div>
+                <button onclick="document.getElementById('local-mode-alert').classList.add('hidden')" class="text-amber-500 hover:text-amber-800 transition-colors mr-4">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- المحتوى المركزي الفعلي -->
+        <main class="container mx-auto px-4 py-8 flex-1">
+            
+            <!-- 1. تبويب المؤشرات -->
+            <div id="tab-dashboard-content" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- كارد الإجمالي العام السنوي -->
+                    <div class="bg-emerald-800 text-white rounded-xl shadow-md p-6 flex items-start gap-4 relative overflow-hidden">
+                        <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-10">
+                            <i class="fa-solid fa-coins text-8xl"></i>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-lg relative z-10">
+                            <i class="fa-solid fa-chart-line text-2xl text-emerald-300"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <p className="text-sm text-emerald-100 font-medium">الإجمالي العام السنوي</p>
+                            <h3 className="text-3xl font-extrabold mt-1"><span id="summary-total-rent">0</span> <span class="text-sm font-normal text-emerald-200">ر.ع</span></h3>
+                            <p class="text-xs text-emerald-200 mt-2">المياه + العقارات والأراضي</p>
+                        </div>
+                    </div>
+
+                    <!-- كارد إيرادات العقارات والأراضي -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
+                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg">
+                            <i class="fa-solid fa-map-location-dot text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 font-medium">إيرادات الأراضي المستثمرة</p>
+                            <h3 class="text-2xl font-bold text-indigo-700 mt-1"><span id="summary-land-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
+                            <p class="text-xs text-slate-400 mt-1">القطع السكنية والتجارية والزراعية</p>
+                        </div>
+                    </div>
+
+                    <!-- كارد إيرادات سقي مياه الأفلاج -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
+                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+                            <i class="fa-solid fa-droplet text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 font-medium">إيرادات أوقاف المياه</p>
+                            <h3 class="text-2xl font-bold text-emerald-700 mt-1"><span id="summary-water-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
+                            <p class="text-xs text-slate-400 mt-1">آجار سقي الأفلاج السنوي</p>
+                        </div>
+                    </div>
+
+                    <!-- كارد مجموع ساعات الماء -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
+                        <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
+                            <i class="fa-solid fa-clock text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 font-medium">مجموع ساعات الماء</p>
+                            <h3 class="text-2xl font-bold text-blue-700 mt-1"><span id="summary-total-hours">0</span> <span class="text-sm font-normal text-slate-500">ساعة</span></h3>
+                            <p class="text-xs text-slate-400 mt-1">موزعة بين فلجي الأسفل والسيب</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- تشارت مقارنة مصادر الأوقاف -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                        <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-pie-chart text-emerald-600"></i> نسبة الإيرادات حسب مصدر الأوقاف
+                        </h4>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1.5 font-semibold">
+                                    <span class="flex items-center gap-2"><i class="fa-solid fa-map text-indigo-500"></i> الأراضي والعقارات المستثمرة</span>
+                                    <span id="land-rent-percent" class="font-bold text-indigo-700">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-3">
+                                    <div id="land-rent-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                                <p id="land-rent-desc" class="text-xs text-slate-400 mt-1"></p>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-sm mb-1.5 font-semibold">
+                                    <span class="flex items-center gap-2"><i class="fa-solid fa-droplet text-emerald-500"></i> أوقاف سقي المياه (الأفلاج)</span>
+                                    <span id="water-rent-percent" class="font-bold text-emerald-700">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-3">
+                                    <div id="water-rent-bar" class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                                <p id="water-rent-desc" class="text-xs text-slate-400 mt-1"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل ريع مياه الأفلاج -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                        <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-tint text-blue-600"></i> توزيع ريع مياه الأفلاج (الأسفل وسقي السيب)
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
+                                <div>
+                                    <span class="font-bold text-amber-800 block text-sm">سقي الأسفل</span>
+                                    <span id="summary-asfal-hours" class="text-xs text-slate-500">0 ساعات ماء</span>
+                                </div>
+                                <div class="text-left">
+                                    <span id="summary-asfal-rent" class="font-bold text-slate-700 text-base">0 ر.ع</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-teal-50 rounded-lg border border-teal-100">
+                                <div>
+                                    <span class="font-bold text-teal-800 block text-sm">سقي السيب</span>
+                                    <span id="summary-seeb-hours" class="text-xs text-slate-500">0 ساعات ماء</span>
+                                </div>
+                                <div class="text-left">
+                                    <span id="summary-seeb-rent" class="font-bold text-slate-700 text-base">0 ر.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. تبويب سجل الآجار والعقود -->
+            <div id="tab-ledger-content" class="hidden space-y-6">
+                <!-- شاشة إضافة عقد جديد (للمسؤول فقط) -->
+                <div id="admin-add-form-container" class="hidden bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
+                    <button onclick="toggleAddForm()" class="w-full px-6 py-4 bg-emerald-800 text-white flex justify-between items-center font-bold hover:bg-emerald-900 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> إضافة عقد / استثمار وقفي جديد (يُحفظ تلقائياً في السحابة)
+                        </span>
+                        <span id="add-form-toggle-label">فتح الاستمارة [+]</span>
+                    </button>
+                    
+                    <div id="add-form-body" class="hidden p-6 border-t border-slate-100 bg-slate-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">نوع الاستثمار الوقفي</label>
+                                <select id="form-type" onchange="toggleFormWaterFields()" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="land">أرض / عقار استثماري</option>
+                                    <option value="water">مياه أفلاج وسقي</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">اسم الوقف / الأرض</label>
+                                <input type="text" id="form-name" placeholder="مثل: أرض الوقف رقم 10" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستأجر</label>
+                                <input type="text" id="form-tenant" placeholder="الاسم الثلاثي والقبيلة" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">رقم الهاتف</label>
+                                <input type="text" id="form-phone" placeholder="9xxxxxxx" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">مبلغ الآجار السنوي (ر.ع)</label>
+                                <input type="number" id="form-rent" placeholder="مثال: 150" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">مدة العقد</label>
+                                <input type="text" id="form-duration" placeholder="مثال: 10 سنوات" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <div id="form-water-falaj-container" class="hidden">
+                                <label class="block text-xs font-bold text-slate-600 mb-1">سقي الفلج</label>
+                                <select id="form-falaj" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="الأسفل">الأسفل</option>
+                                    <option value="السيب">السيب</option>
+                                </select>
+                            </div>
+
+                            <div id="form-water-hours-container" class="hidden">
+                                <label class="block text-xs font-bold text-slate-600 mb-1">ساعات الماء</label>
+                                <input type="number" id="form-hours" placeholder="مثال: 2" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-6">
+                            <button onclick="saveNewContract()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-md font-bold transition-all">
+                                حفظ العقود وتحديث النظام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- جدول العرض الرئيسي ومفاتيح التصفية -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-wrap gap-4 items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">قائمة العقود والأوقاف ببلدة منال</h2>
+                            <p class="text-xs text-slate-500 mt-1 font-medium">عرض ومتابعة عقود الأراضي المستثمرة ومياه الأفلاج بصفة دورية</p>
+                        </div>
+
+                        <!-- مفتاح التصفية -->
+                        <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold">
+                            <button onclick="setFilter('all')" id="btn-filter-all" class="px-3 py-1.5 rounded-md transition-all bg-white text-emerald-800 shadow-sm">الكل</button>
+                            <button onclick="setFilter('land')" id="btn-filter-land" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">أراضي وعقارات</button>
+                            <button onclick="setFilter('water')" id="btn-filter-water" class="px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700">أوقاف مياه</button>
+                        </div>
+
+                        <!-- أدوات التحكم في العرض وقائمة السنوات -->
+                        <div class="flex items-center gap-6 bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+                            <div id="year-select-container" class="flex items-center gap-2">
+                                <label class="text-sm font-semibold text-slate-700">سنة الدفع:</label>
+                                <select id="year-select" onchange="changeSelectedYear()" class="border border-slate-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-bold">
+                                    <!-- سيتم الملء ديناميكياً -->
+                                </select>
+                            </div>
+                            
+                            <div id="admin-toggles-container" class="hidden flex items-center gap-4 bg-emerald-50/50 px-3 py-1.5 rounded-md border border-emerald-100">
+                                <span class="text-xs font-bold text-emerald-800 ml-1">تحكم عرض الجمهور:</span>
+                                <button onclick="handleToggleOption('names')" id="toggle-names" class="flex items-center gap-1 text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-eye"></i> الأسماء
+                                </button>
+                                <button onclick="handleToggleOption('phones')" id="toggle-phones" class="flex items-center gap-1 text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-eye-slash"></i> الهواتف
+                                </button>
+                                <button onclick="handleToggleOption('payments')" id="toggle-payments" class="flex items-center gap-1 text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-eye-slash"></i> حالة الدفع
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 whitespace-nowrap">اسم الوقف</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">النوع</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">اسم المستأجر</th>
+                                    <th id="th-phone" class="px-6 py-4 whitespace-nowrap hidden">رقم الهاتف</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">سقي الفلج</th>
+                                    <th class="px-6 py-4 whitespace-nowrap text-center">ساعات الماء</th>
+                                    <th class="px-6 py-4 whitespace-nowrap text-center">الآجار (ريال)</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">مدة العقد</th>
+                                    <th id="th-payments" class="px-6 py-4 whitespace-nowrap text-center hidden">حالة الدفع</th>
+                                    <th id="th-whatsapp" class="px-6 py-4 whitespace-nowrap text-center hidden">تنبيه واتساب</th>
+                                    <th id="th-actions" class="px-6 py-4 whitespace-nowrap text-center hidden">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledger-table-body" class="divide-y divide-slate-100">
+                                <!-- سيتم الملء ديناميكياً من الجافا سكريبت -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. تبويب حاسبة التقسيم -->
+            <div id="tab-distribution-content" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- إما لوحة تحكم التعديل (للإدارة) أو شاشة العرض (للناس) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                            
+                            <!-- محتوى المسؤول (إمكانية التعديل) -->
+                            <div id="admin-distribution-controls" class="hidden">
+                                <div class="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                            <i class="fa-solid fa-calculator text-emerald-600"></i> لوحة التحكم بمصارف ونسب الوقف ببلدة منال
+                                        </h2>
+                                        <p class="text-xs text-slate-500 mt-1 font-medium">بصفتك مسؤولاً، يمكنك تعديل المصارف والنسب المئوية لتقسيم الإيرادات العامة.</p>
+                                    </div>
+                                    <button onclick="addWaqfPurpose()" class="text-sm flex items-center gap-1 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-md hover:bg-emerald-100 transition-colors font-bold">
+                                        <i class="fa-solid fa-plus"></i> إضافة مصرف
+                                    </button>
+                                </div>
+
+                                <div id="percentage-alert" class="hidden mb-6 p-4 bg-red-50 text-red-700 rounded-lg flex items-start gap-3 border border-red-100">
+                                    <i class="fa-solid fa-triangle-exclamation text-xl shrink-0"></i>
+                                    <div>
+                                        <p class="font-bold">تنبيه: مجموع النسب لا يساوي 100%</p>
+                                        <p class="text-sm mt-1 font-medium">يرجى تعديل النسب لتساوي 100% لضمان صحة توزيع أموال الأوقاف.</p>
+                                    </div>
+                                </div>
+
+                                <div id="admin-purposes-list" class="space-y-4">
+                                    <!-- سيتم ملؤه ديناميكياً بالحقول القابلة للتعديل -->
+                                </div>
+                            </div>
+
+                            <!-- محتوى العامة (اطلاع وقراءة فقط) -->
+                            <div id="public-distribution-view">
+                                <div class="mb-6 border-b border-slate-100 pb-4">
+                                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <i class="fa-solid fa-calculator text-emerald-600"></i> بيان توزيع ريع الأوقاف المعتمد لبلدة منال
+                                    </h2>
+                                    <p class="text-sm text-slate-500 mt-1 font-medium">توزيع آلي وشامل لجميع إيرادات الأوقاف (المياه + الأراضي المستثمرة) تلبيةً لشروط الوقف الشرعية المقررة.</p>
+                                </div>
+
+                                <div id="public-purposes-bars" class="space-y-6">
+                                    <!-- سيتم ملؤه ديناميكياً بقوالب ملوّنة وجذابة -->
+                                </div>
+
+                                <div class="mt-6 p-4 bg-emerald-50/50 rounded-lg text-xs text-emerald-800 border border-emerald-100/50 leading-relaxed font-medium">
+                                    * تُحسب المبالغ الموزعة أعلاه ديناميكياً وتلقائياً بناءً على إجمالي عقود الأوقاف والآجارات النشطة البالغة <strong id="distribution-total-text">0 ر.ع</strong> (تجمع بين مياه سقي الفلج والأراضي المستثمرة) وبحسب النسب المقررة من لجنة الأوقاف.
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- بطاقة عرض الحصص المالية الموزعة -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-emerald-800 text-white rounded-xl shadow-lg p-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                            
+                            <h3 class="text-emerald-100 text-sm font-medium mb-1">المبلغ الإجمالي السنوي الخاضع للتقسيم</h3>
+                            <div class="text-4xl font-extrabold mb-4"><span id="dist-card-total">0</span> <span class="text-lg font-normal opacity-80">ر.ع</span></div>
+                            
+                            <div class="w-full bg-emerald-900/50 rounded-full h-1.5 mb-6">
+                                <div id="dist-card-progress" class="h-1.5 rounded-full bg-emerald-400" style="width: 100%"></div>
+                            </div>
+
+                            <div class="space-y-4 relative z-10">
+                                <h4 class="font-bold border-b border-emerald-700/50 pb-2 text-sm text-emerald-200">حصص التوزيع السنوية:</h4>
+                                <div id="dist-card-shares-list" class="space-y-3">
+                                    <!-- سيتم ملؤه ديناميكياً -->
+                                </div>
+                            </div>
+                            
+                            <div id="dist-card-sum-container" class="mt-6 pt-4 border-t border-emerald-700/50 flex justify-between items-center font-bold text-base">
+                                <span>إجمالي ريع مجمع الأوقاف</span>
+                                <span id="dist-card-sum-val">0 ر.ع</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- تذييل الصفحة الموحد -->
+    <footer class="bg-emerald-950 text-emerald-200 text-center py-4 border-t border-emerald-900 text-xs font-semibold">
+        جميع الحقوق محفوظة لوكلاء وأوقاف مساجد بلدة منال © 2026م
+    </footer>
+
+    <!-- ================= الـ JavaScript التفاعلي وقاعدة البيانات السحابية ================= -->
+    <script type="module">
+        // استيراد أدوات قاعدة البيانات السحابية المحدثة للإصدار المستقر والمثالي 10.8.0
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        // --- البيانات الأولية الافتراضية ---
+        const initialRecords = [
+            { id: 1, type: 'water', name: 'المسجدية', tenant: 'نواف بن سيف الراشدي', phone: '92721229', falaj: 'الأسفل', hours: 3, rent: 165, duration: '10 سنوات' },
+            { id: 2, type: 'water', name: 'الشبيلية', tenant: 'عرفة بن باروت السليمي', phone: '99515302', falaj: 'الأسفل', hours: 1, rent: 40, duration: '10 سنوات' },
+            { id: 3, type: 'water', name: 'المضة', tenant: 'هيثم بن سيف بن حمدان الراشدي', phone: '95416019', falaj: 'الأسفل', hours: 2, rent: 100, duration: '10 سنوات' },
+            { id: 4, type: 'water', name: 'المقاصين', tenant: 'حمد بن حميد القاسمي', phone: '93548884', falaj: 'الأسفل', hours: 3, rent: 165, duration: '10 سنوات' },
+            { id: 5, type: 'water', name: 'الوردي', tenant: 'خالد بن ماجد البكري', phone: '92926943', falaj: 'الأسفل', hours: 2, rent: 90, duration: '10 سنوات' },
+            { id: 6, type: 'water', name: 'القطعة', tenant: 'حمود بن حميد القاسمي', phone: '91333603', falaj: 'الأسفل', hours: 2, rent: 110, duration: '10 سنوات' },
+            { id: 7, type: 'water', name: 'العلاوة', tenant: 'هشام بن محمد الهشامي', phone: '99252519', falaj: 'الأسفل', hours: 2, rent: 105, duration: '10 سنوات' },
+            { id: 8, type: 'water', name: 'صوار العاضد', tenant: 'ياسر بن ناصر بن هلال الفارسي', phone: '92444967', falaj: 'الأسفل', hours: 1, rent: 60, duration: '10 سنوات' },
+            { id: 9, type: 'water', name: 'جلبة النبهانية', tenant: 'غالب بن طالب الهشامي', phone: '92566652', falaj: 'الأسفل', hours: 5, rent: 800, duration: '10 سنوات' },
+            { id: 10, type: 'water', name: 'جلبة الخطة + سابة الخطة', tenant: 'سيف بن سعيد الراشدي', phone: '92526695', falaj: 'الأسفل', hours: 3, rent: 110, duration: '10 سنوات' },
+            { id: 11, type: 'water', name: 'البواشرة', tenant: 'طالب بن علي الرواحي', phone: '94585990', falaj: 'السيب', hours: 1, rent: 65, duration: '10 سنوات' },
+            { id: 12, type: 'water', name: 'بني خليل 1+ 2', tenant: 'قيس بن سيف الراشدي', phone: '92122055', falaj: 'السيب', hours: 2, rent: 65, duration: '10 سنوات' },
+            { id: 13, type: 'water', name: 'الشيع الجنوبية', tenant: 'جابر بن عبدالله بن حمد الرواحي', phone: '71165651', falaj: 'السيب', hours: 2, rent: 85, duration: '10 سنوات' },
+            { id: 14, type: 'water', name: 'الشيع الشمالية', tenant: 'احمد بن عبدالله الراشدي', phone: '99343243', falaj: 'السيب', hours: 2, rent: 60, duration: '10 سنوات' },
+            { id: 15, type: 'water', name: 'اللجل الغربية', tenant: 'ربيع بن ثاني الرواحي', phone: '98803133', falaj: 'السيب', hours: 2, rent: 65, duration: '10 سنوات' },
+            { id: 16, type: 'water', name: 'عين الزام', tenant: 'هشام بن محمد الهشامي', phone: '99252519', falaj: 'السيب', hours: 1, rent: 45, duration: '10 سنوات' },
+            { id: 17, type: 'water', name: 'المدرة', tenant: 'احمد بن محمد بن حمدان الراشدي', phone: '92338400', falaj: 'السيب', hours: 2, rent: 80, duration: '10 سنوات' },
+            { id: 18, type: 'water', name: 'بني خليل ٣+٤', tenant: 'هشام بن محمد الهشامي', phone: '99252519', falaj: 'السيب', hours: 2, rent: 75, duration: '10 سنوات' },
+            { id: 19, type: 'water', name: 'جلبة الوادي', tenant: 'هشام بن محمد الهشامي', phone: '99252519', falaj: 'السيب', hours: 1, rent: 60, duration: '10 سنوات' },
+            { id: 20, type: 'water', name: 'جلبة الاكفان ووقف البكريين...', tenant: 'علي بن عبدالله بن حمد الرواحي', phone: '99605303', falaj: 'السيب', hours: 4, rent: 185, duration: '10 سنوات' },
+            { id: 21, type: 'water', name: 'ساعتين ماء من السيب', tenant: 'نبهان بن حمد بن نبهان الرواحي', phone: '92510418', falaj: 'السيب', hours: 2, rent: 90, duration: 'سنة واحدة' },
+            
+            { id: 101, type: 'land', name: 'أرض الوقف التجارية رقم 1 (محل تجاري)', tenant: 'صالح بن سعيد الهشامي', phone: '95112233', falaj: '—', hours: 0, rent: 360, duration: '5 سنوات' },
+            { id: 102, type: 'land', name: 'أرض الوقف السكنية (شقة سكنية)', tenant: 'خلفان بن ناصر الراشدي', phone: '92445566', falaj: '—', hours: 0, rent: 180, duration: '3 سنوات' },
+            { id: 103, type: 'land', name: 'أرض بلدة منال الزراعية المستثمرة', tenant: 'سيف بن حمود البكري', phone: '93338800', falaj: '—', hours: 0, rent: 500, duration: '10 سنوات' },
+        ];
+
+        const initialPurposes = [
+            { id: 1, name: 'المسجد (عمارة وصيانة)', percent: 30 },
+            { id: 2, name: 'إفطار صائم', percent: 15 },
+            { id: 3, name: 'المعلم (مدرس القرآن)', percent: 15 },
+            { id: 4, name: 'الأكفان', percent: 10 },
+            { id: 5, name: 'الكتب (المصاحف)', percent: 10 },
+            { id: 6, name: 'البلاد (المصالح العامة)', percent: 20 },
+        ];
+
+        const baseYears = Array.from({length: 10}, (_, i) => 2026 + i);
+
+        // كائن الحالة الرئيسي لبلدة منال
+        let state = {
+            records: initialRecords.map(r => ({
+                ...r,
+                payments: baseYears.reduce((acc, year) => ({ ...acc, [year]: false }), {})
+            })),
+            purposes: [...initialPurposes],
+            showNames: true,
+            showPhones: false,
+            showPaymentsToPublic: false
+        };
+
+        let userRole = null; 
+        let visitorName = '';
+        let activeTab = 'dashboard';
+        let filterType = 'all'; 
+        let selectedYear = 2026;
+        let isSaving = false;
+        let currentUser = null;
+
+        // تهيئة وحقن مفاتيح الاتصال لمشروع Firebase الخاص بك بشكل مباشر وثابت
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC1BB2MCOM1hr8MU734tr0V-E9pmE5IBg",
+            authDomain: "waqfdata-d4a01.firebaseapp.com",
+            projectId: "waqfdata-d4a01",
+            storageBucket: "waqfdata-d4a01.firebasestorage.app",
+            messagingSenderId: "572617443091",
+            appId: "1:572617443091:web:99e8d08491f7bee3a1bce6",
+            measurementId: "G-XBJH9JX7F8"
+        };
+
+        const appId = 'manal-waqf-system';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // دالة تحديث مؤشر الاتصال السحابي والتنبيهات الفرعية
+        function setCloudStatus(status) {
+            const indicator = document.getElementById('cloud-indicator');
+            const localAlert = document.getElementById('local-mode-alert');
+            if (!indicator) return;
+            
+            if (status === 'connecting') {
+                indicator.innerHTML = `<i class="fa-solid fa-sync animate-spin"></i> اتصال الأوقاف...`;
+                indicator.className = "flex items-center gap-2 text-xs font-bold text-amber-300";
+                if (localAlert) localAlert.classList.add('hidden');
+            } else if (status === 'synced') {
+                indicator.innerHTML = `<i class="fa-solid fa-cloud"></i> ${isSaving ? 'يُحفظ...' : 'مُتصل وسحابي'}`;
+                indicator.className = "flex items-center gap-2 text-xs font-bold text-emerald-300";
+                if (localAlert) localAlert.classList.add('hidden');
+            } else if (status === 'error' || status === 'local') {
+                indicator.innerHTML = `<i class="fa-solid fa-cloud-meatball"></i> وضع محلي مؤقت`;
+                indicator.className = "flex items-center gap-2 text-xs font-bold text-slate-300";
+                if (localAlert) localAlert.classList.remove('hidden');
+            }
+        }
+
+        // الحفظ السحابي التلقائي (تطبيق دقيق للمسارات)
+        async function syncToCloud() {
+            if (!db || !currentUser) return; 
+            isSaving = true;
+            setCloudStatus('synced');
+            try {
+                // استخدام مسار آمن ومطابق بالكامل: /artifacts/{appId}/public/data/{collectionName}
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'state');
+                await setDoc(docRef, {
+                    records: state.records,
+                    purposes: state.purposes,
+                    showNames: state.showNames,
+                    showPhones: state.showPhones,
+                    showPaymentsToPublic: state.showPaymentsToPublic
+                }, { merge: true });
+                setCloudStatus('synced');
+            } catch (error) {
+                console.error("فشل المزامنة السحابية:", error);
+                setCloudStatus('error');
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        // ================= تفعيل المزامنة وقراءة المستند في الوقت الحقيقي =================
+        window.addEventListener('DOMContentLoaded', () => {
+            // ملء قائمة السنوات
+            const yearSelect = document.getElementById('year-select');
+            baseYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            });
+
+            setCloudStatus('connecting');
+
+            // إكمال المصادقة أولاً قبل أي استعلام (القاعدة الثالثة)
+            const initAuth = async () => {
+                try {
+                    await signInAnonymously(auth);
+                } catch (err) {
+                    console.error("خطأ الدخول المجهول لـ Firebase:", err);
+                    setCloudStatus('error');
+                    render();
+                }
+            };
+
+            initAuth().then(() => {
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        // مسار الاستعلام السحابي المطابق للقواعد
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'state');
+                        onSnapshot(docRef, (docSnap) => {
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                if (data.records) state.records = data.records;
+                                if (data.purposes) state.purposes = data.purposes;
+                                if (data.showNames !== undefined) state.showNames = data.showNames;
+                                if (data.showPhones !== undefined) state.showPhones = data.showPhones;
+                                if (data.showPaymentsToPublic !== undefined) state.showPaymentsToPublic = data.showPaymentsToPublic;
+                                setCloudStatus('synced');
+                                render();
+                            } else {
+                                // تهيئة المستند الأول على السحابة ببيانات بلدة منال
+                                setDoc(docRef, {
+                                    records: state.records,
+                                    purposes: state.purposes,
+                                    showNames: state.showNames,
+                                    showPhones: state.showPhones,
+                                    showPaymentsToPublic: state.showPaymentsToPublic
+                                }).then(() => {
+                                    setCloudStatus('synced');
+                                    render();
+                                }).catch((err) => {
+                                    console.error("خطأ إعداد المستند السحابي الأساسي:", err);
+                                });
+                            }
+                        }, (error) => {
+                            console.error("خطأ قراءة مستند Firestore:", error);
+                            setCloudStatus('error');
+                            render();
+                        });
+                    } else {
+                        setCloudStatus('error');
+                    }
+                });
+            });
+        });
+
+        // ================= العمليات الحسابية لمجمع الإيرادات =================
+        const calculateSummary = () => {
+            let totalRent = 0;
+            let totalHours = 0;
+            let waterRent = 0;
+            let landRent = 0;
+            let asfalRent = 0, asfalHours = 0;
+            let seebRent = 0, seebHours = 0;
+
+            state.records.forEach(r => {
+                totalRent += Number(r.rent) || 0;
+                if (r.type === 'water') {
+                    waterRent += Number(r.rent) || 0;
+                    totalHours += Number(r.hours) || 0;
+                    if (r.falaj === 'الأسفل') {
+                        asfalRent += Number(r.rent) || 0;
+                        asfalHours += Number(r.hours) || 0;
+                    } else if (r.falaj === 'السيب') {
+                        seebRent += Number(r.rent) || 0;
+                        seebHours += Number(r.hours) || 0;
+                    }
+                } else if (r.type === 'land') {
+                    landRent += Number(r.rent) || 0;
+                }
+            });
+
+            return { totalRent, totalHours, waterRent, landRent, asfalRent, asfalHours, seebRent, seebHours };
+        };
+
+        // ================= واجهة العرض والتحديث التفاعلي =================
+        function render() {
+            const sum = calculateSummary();
+
+            // 1. لوحة المؤشرات
+            document.getElementById('summary-total-rent').textContent = sum.totalRent;
+            document.getElementById('summary-land-rent').textContent = sum.landRent;
+            document.getElementById('summary-water-rent').textContent = sum.waterRent;
+            document.getElementById('summary-total-hours').textContent = sum.totalHours;
+
+            // النسب المئوية في لوحة المؤشرات
+            const landPct = sum.totalRent > 0 ? ((sum.landRent / sum.totalRent) * 100).toFixed(1) : 0;
+            const waterPct = sum.totalRent > 0 ? ((sum.waterRent / sum.totalRent) * 100).toFixed(1) : 0;
+
+            document.getElementById('land-rent-percent').textContent = `${landPct}%`;
+            document.getElementById('land-rent-bar').style.width = `${landPct}%`;
+            document.getElementById('land-rent-desc').textContent = `تدر عائداً قدره ${sum.landRent} ر.ع سنوياً`;
+
+            document.getElementById('water-rent-percent').textContent = `${waterPct}%`;
+            document.getElementById('water-rent-bar').style.width = `${waterPct}%`;
+            document.getElementById('water-rent-desc').textContent = `تدر عائداً قدره ${sum.waterRent} ر.ع سنوياً`;
+
+            document.getElementById('summary-asfal-hours').textContent = `${sum.asfalHours} ساعات ماء`;
+            document.getElementById('summary-asfal-rent').textContent = `${sum.asfalRent} ر.ع`;
+            document.getElementById('summary-seeb-hours').textContent = `${sum.seebHours} ساعات ماء`;
+            document.getElementById('summary-seeb-rent').textContent = `${sum.seebRent} ر.ع`;
+
+            // 2. تحديث الترويسة حسب مستويات الصلاحيات المفتوحة
+            const badge = document.getElementById('badge-role');
+            const welcome = document.getElementById('welcome-message');
+            
+            if (userRole === 'admin') {
+                badge.textContent = 'صلاحية مسؤول';
+                badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-amber-400 text-slate-900";
+                welcome.textContent = 'لوحة تحكم إدارية كاملة للأصول والأملاك الوقفية لبلدة منال';
+                
+                // تفعيل شاشات المسؤول بالكامل
+                document.getElementById('admin-add-form-container').classList.remove('hidden');
+                document.getElementById('admin-toggles-container').classList.remove('hidden');
+                document.getElementById('th-phone').classList.remove('hidden');
+                document.getElementById('th-payments').classList.remove('hidden');
+                document.getElementById('th-whatsapp').classList.remove('hidden');
+                document.getElementById('th-actions').classList.remove('hidden');
+                
+                document.getElementById('admin-distribution-controls').classList.remove('hidden');
+                document.getElementById('public-distribution-view').classList.add('hidden');
+            } else {
+                badge.textContent = 'صلاحية زائر';
+                badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-600 text-white";
+                welcome.textContent = `مرحباً بك${visitorName ? ` الفاضل/ ${visitorName}` : ''}، واجهة عرض الأهالي والزوار للقراءة`;
+
+                // تعطيل وإخفاء شاشات المسؤول
+                document.getElementById('admin-add-form-container').classList.add('hidden');
+                document.getElementById('admin-toggles-container').classList.add('hidden');
+                
+                // تعديل عرض الأعمدة بحسب خيارات العرض السحابية المقررة من المسؤول
+                if (state.showPhones) {
+                    document.getElementById('th-phone').classList.remove('hidden');
+                } else {
+                    document.getElementById('th-phone').classList.add('hidden');
+                }
+
+                if (state.showPaymentsToPublic) {
+                    document.getElementById('th-payments').classList.remove('hidden');
+                    document.getElementById('year-select-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('th-payments').classList.add('hidden');
+                    document.getElementById('year-select-container').classList.add('hidden');
+                }
+
+                document.getElementById('th-whatsapp').classList.add('hidden');
+                document.getElementById('th-actions').classList.add('hidden');
+
+                document.getElementById('admin-distribution-controls').classList.add('hidden');
+                document.getElementById('public-distribution-view').classList.remove('hidden');
+            }
+
+            // تحديث تصميم أزرار الخيارات الإدارية
+            updateToggleButtonsStyle();
+
+            // 3. رندرة قائمة وجدول العقود
+            renderLedgerTable(sum.totalRent);
+
+            // 4. رندرة التوزيع والحصص المخصصة في الحاسبة
+            renderDistributionSection(sum.totalRent);
+        }
+
+        // تحديث أزرار خيارات العرض للجمهور وتثبيتها سحابياً
+        function updateToggleButtonsStyle() {
+            if (userRole !== 'admin') return;
+            const toggleNames = document.getElementById('toggle-names');
+            const togglePhones = document.getElementById('toggle-phones');
+            const togglePayments = document.getElementById('toggle-payments');
+
+            toggleNames.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showNames ? 'text-emerald-700' : 'text-slate-400'}`;
+            toggleNames.innerHTML = `<i class="fa-solid ${state.showNames ? 'fa-eye' : 'fa-eye-slash'}"></i> الأسماء`;
+
+            togglePhones.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showPhones ? 'text-emerald-700' : 'text-slate-400'}`;
+            togglePhones.innerHTML = `<i class="fa-solid ${state.showPhones ? 'fa-eye' : 'fa-eye-slash'}"></i> الهواتف`;
+
+            togglePayments.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showPaymentsToPublic ? 'text-emerald-700' : 'text-slate-400'}`;
+            togglePayments.innerHTML = `<i class="fa-solid ${state.showPaymentsToPublic ? 'fa-eye' : 'fa-eye-slash'}"></i> حالة الدفع`;
+        }
+
+        // بناء صفوف الجدول ببيانات دقيقة ومفلترة
+        function renderLedgerTable(totalRent) {
+            const tableBody = document.getElementById('ledger-table-body');
+            tableBody.innerHTML = '';
+
+            const filtered = state.records.filter(r => {
+                if (filterType === 'all') return true;
+                return r.type === filterType;
+            });
+
+            filtered.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-emerald-50/50 transition-colors";
+
+                // اسم الوقف
+                const tdName = document.createElement('td');
+                tdName.className = "px-6 py-4 font-bold text-slate-850";
+                tdName.textContent = record.name;
+                tr.appendChild(tdName);
+
+                // النوع
+                const tdType = document.createElement('td');
+                tdType.className = "px-6 py-4";
+                tdType.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${record.type === 'land' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">${record.type === 'land' ? 'أرض/عقار' : 'مياه وسقي'}</span>`;
+                tr.appendChild(tdType);
+
+                // اسم المستأجر (مشروط بالحماية)
+                const tdTenant = document.createElement('td');
+                tdTenant.className = "px-6 py-4 text-slate-600 font-semibold";
+                if (userRole === 'admin' || state.showNames) {
+                    tdTenant.textContent = record.tenant;
+                } else {
+                    tdTenant.innerHTML = `<span class="text-slate-400 tracking-widest">••••••••••</span>`;
+                }
+                tr.appendChild(tdTenant);
+
+                // رقم الهاتف
+                if (userRole === 'admin' || state.showPhones) {
+                    const tdPhone = document.createElement('td');
+                    tdPhone.className = "px-6 py-4 text-slate-600 dir-ltr font-bold";
+                    tdPhone.textContent = record.phone;
+                    tr.appendChild(tdPhone);
+                }
+
+                // سقي الفلج
+                const tdFalaj = document.createElement('td');
+                tdFalaj.className = "px-6 py-4";
+                tdFalaj.innerHTML = `<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold ${record.falaj === 'الأسفل' ? 'bg-amber-100 text-amber-700' : record.falaj === 'السيب' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-400'}">${record.falaj}</span>`;
+                tr.appendChild(tdFalaj);
+
+                // ساعات الماء
+                const tdHours = document.createElement('td');
+                tdHours.className = "px-6 py-4 text-center font-extrabold text-slate-700";
+                tdHours.textContent = record.hours > 0 ? record.hours : '—';
+                tr.appendChild(tdHours);
+
+                // الآجار
+                const tdRent = document.createElement('td');
+                tdRent.className = "px-6 py-4 text-center font-extrabold text-emerald-700 text-base";
+                tdRent.textContent = record.rent;
+                tr.appendChild(tdRent);
+
+                // مدة العقد
+                const tdDuration = document.createElement('td');
+                tdDuration.className = "px-6 py-4 text-slate-500 font-semibold text-xs whitespace-nowrap";
+                tdDuration.textContent = record.duration;
+                tr.appendChild(tdDuration);
+
+                // حالة الدفع للسنوات
+                if (userRole === 'admin' || state.showPaymentsToPublic) {
+                    const tdPayment = document.createElement('td');
+                    tdPayment.className = "px-6 py-4 text-center";
+                    const isPaid = record.payments && record.payments[selectedYear];
+
+                    if (userRole === 'admin') {
+                        const btnPay = document.createElement('button');
+                        btnPay.className = `inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isPaid ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}`;
+                        btnPay.innerHTML = `<i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}`;
+                        btnPay.onclick = () => window.togglePayment(record.id);
+                        tdPayment.appendChild(btnPay);
+                    } else {
+                        tdPayment.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold ${isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-600 border border-red-200'}"><i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}</span>`;
+                    }
+                    tr.appendChild(tdPayment);
+                }
+
+                // تنبيه واتساب
+                if (userRole === 'admin') {
+                    const tdWhatsapp = document.createElement('td');
+                    tdWhatsapp.className = "px-6 py-4 text-center";
+                    const isPaid = record.payments && record.payments[selectedYear];
+                    
+                    const btnWa = document.createElement('button');
+                    btnWa.disabled = isPaid;
+                    btnWa.className = `inline-flex items-center justify-center p-2 rounded-full transition-all ${isPaid ? 'text-slate-300 cursor-not-allowed' : 'text-green-600 hover:bg-green-50 hover:text-green-700'}`;
+                    btnWa.innerHTML = `<i class="fa-solid fa-comment text-lg"></i>`;
+                    btnWa.onclick = () => window.sendWhatsApp(record);
+                    tdWhatsapp.appendChild(btnWa);
+                    tr.appendChild(tdWhatsapp);
+                }
+
+                // حذف العقد
+                if (userRole === 'admin') {
+                    const tdDel = document.createElement('td');
+                    tdDel.className = "px-6 py-4 text-center";
+                    tdDel.innerHTML = `<button onclick="window.deleteContract(${record.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors" title="حذف هذا العقد"><i class="fa-solid fa-trash-can"></i></button>`;
+                    tr.appendChild(tdDel);
+                }
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // بناء حاسبة التوزيع والحصص التلقائية
+        function renderDistributionSection(totalRent) {
+            document.getElementById('dist-card-total').textContent = totalRent;
+            document.getElementById('distribution-total-text').textContent = `${totalRent} ر.ع`;
+
+            const totalPct = state.purposes.reduce((acc, p) => acc + p.percent, 0);
+            const distProgress = document.getElementById('dist-card-progress');
+            const alertBox = document.getElementById('percentage-alert');
+
+            if (totalPct === 100) {
+                distProgress.className = "h-1.5 rounded-full bg-emerald-400";
+                alertBox.classList.add('hidden');
+            } else {
+                distProgress.className = "h-1.5 rounded-full bg-red-400";
+                alertBox.classList.remove('hidden');
+            }
+            distProgress.style.width = `${Math.min(totalPct, 100)}%`;
+
+            // بناء البطاقة الجانبية للتوزيع المالي
+            const sharesList = document.getElementById('dist-card-shares-list');
+            sharesList.innerHTML = '';
+            state.purposes.forEach(p => {
+                const amount = (totalRent * (p.percent / 100)).toFixed(2);
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center text-sm";
+                div.innerHTML = `
+                    <span class="text-emerald-50 flex items-center gap-2 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                        ${p.name} (${p.percent}%)
+                    </span>
+                    <span class="font-extrabold">${amount} ر.ع</span>
+                `;
+                sharesList.appendChild(div);
+            });
+
+            document.getElementById('dist-card-sum-val').textContent = `${totalRent.toFixed(2)} ر.ع`;
+
+            // بناء واجهة الإدارة (تعديل الأغراض والنسب)
+            const adminPurposesList = document.getElementById('admin-purposes-list');
+            adminPurposesList.innerHTML = '';
+            state.purposes.forEach(purpose => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100";
+                div.innerHTML = `
+                    <div class="flex-1">
+                      <label class="block text-xs text-slate-500 mb-1 font-bold">اسم المصرف / الغرض</label>
+                      <input type="text" value="${purpose.name}" onchange="window.updatePurposeName(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                    </div>
+                    <div class="w-24">
+                      <label class="block text-xs text-slate-500 mb-1 font-bold">النسبة (%)</label>
+                      <input type="number" value="${purpose.percent}" onchange="window.updatePurposePercent(${purpose.id}, this.value)" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800" min="0" max="100">
+                    </div>
+                    <div class="pt-5">
+                      <button onclick="window.deletePurpose(${purpose.id})" class="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50" title="حذف المصرف">
+                        <i class="fa-solid fa-trash-can text-lg"></i>
+                      </button>
+                    </div>
+                `;
+                adminPurposesList.appendChild(div);
+            });
+
+            // بناء واجهة الأهالي (مخططات العرض والشفافية)
+            const publicPurposesBars = document.getElementById('public-purposes-bars');
+            publicPurposesBars.innerHTML = '';
+            state.purposes.forEach(p => {
+                const amount = (totalRent * (p.percent / 100)).toFixed(2);
+                const div = document.createElement('div');
+                div.className = "bg-slate-50 p-4 rounded-xl border border-slate-100";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-800 text-base">${p.name}</span>
+                        <div class="text-left">
+                            <span class="text-emerald-700 font-extrabold text-lg">${amount} ر.ع</span>
+                            <span class="text-xs text-slate-400 block font-semibold">بنسبة ${p.percent}%</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-3">
+                        <div class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width: ${p.percent}%"></div>
+                    </div>
+                `;
+                publicPurposesBars.appendChild(div);
+            });
+        }
+
+        // ================= مهام ووظائف التحكم - لربطها بـ HTML =================
+
+        window.showPublicLogin = function() {
+            document.getElementById('gate-screen').classList.add('hidden');
+            document.getElementById('public-login-screen').classList.remove('hidden');
+        };
+
+        window.showAdminLogin = function() {
+            document.getElementById('gate-screen').classList.add('hidden');
+            document.getElementById('admin-login-screen').classList.remove('hidden');
+        };
+
+        window.backToGate = function() {
+            document.getElementById('public-login-screen').classList.add('hidden');
+            document.getElementById('admin-login-screen').classList.add('hidden');
+            document.getElementById('gate-screen').classList.remove('hidden');
+        };
+
+        window.submitAdminLogin = function() {
+            const pass = document.getElementById('admin-password-input').value;
+            if (pass === 'akm1983') {
+                userRole = 'admin';
+                document.getElementById('admin-login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('admin-password-input').value = '';
+                document.getElementById('admin-auth-error').classList.add('hidden');
+                render();
+            } else {
+                document.getElementById('admin-auth-error').classList.remove('hidden');
+            }
+        };
+
+        window.submitPublicLogin = function() {
+            userRole = 'public';
+            visitorName = document.getElementById('visitor-name-input').value.trim();
+            document.getElementById('public-login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            render();
+        };
+
+        window.handleLogout = function() {
+            userRole = null;
+            visitorName = '';
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('gate-screen').classList.remove('hidden');
+            document.getElementById('visitor-name-input').value = '';
+        };
+
+        window.switchTab = function(tabId) {
+            activeTab = tabId;
+            document.getElementById('tab-dashboard-content').classList.add('hidden');
+            document.getElementById('tab-ledger-content').classList.add('hidden');
+            document.getElementById('tab-distribution-content').classList.add('hidden');
+
+            document.getElementById('btn-tab-dashboard').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
+            document.getElementById('btn-tab-ledger').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
+            document.getElementById('btn-tab-distribution').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
+
+            document.getElementById(`tab-${tabId}-content`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tabId}`).className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-emerald-700 border-b-2 border-emerald-700 bg-emerald-50/50";
+        };
+
+        window.setFilter = function(type) {
+            filterType = type;
+            document.getElementById('btn-filter-all').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
+            document.getElementById('btn-filter-land').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
+            document.getElementById('btn-filter-water').className = "px-3 py-1.5 rounded-md transition-all text-slate-500 hover:text-emerald-700";
+
+            document.getElementById(`btn-filter-${type}`).className = "px-3 py-1.5 rounded-md transition-all bg-white text-emerald-800 shadow-sm font-bold";
+            render();
+        };
+
+        window.changeSelectedYear = function() {
+            selectedYear = Number(document.getElementById('year-select').value);
+            render();
+        };
+
+        window.handleToggleOption = function(type) {
+            if (type === 'names') {
+                state.showNames = !state.showNames;
+            } else if (type === 'phones') {
+                state.showPhones = !state.showPhones;
+            } else if (type === 'payments') {
+                state.showPaymentsToPublic = !state.showPaymentsToPublic;
+            }
+            render();
+            syncToCloud();
+        };
+
+        window.togglePayment = function(id) {
+            state.records = state.records.map(rec => {
+                if (rec.id === id) {
+                    const currentPayments = rec.payments || {};
+                    return {
+                        ...rec,
+                        payments: {
+                            ...currentPayments,
+                            [selectedYear]: !currentPayments[selectedYear]
+                        }
+                    };
+                }
+                return rec;
+            });
+            render();
+            syncToCloud();
+        };
+
+        window.deleteContract = function(id) {
+            state.records = state.records.filter(r => r.id !== id);
+            render();
+            syncToCloud();
+        };
+
+        window.sendWhatsApp = function(record) {
+            const phone = record.phone.startsWith('9') || record.phone.startsWith('7') ? `968${record.phone}` : record.phone;
+            const typeLabel = record.type === 'land' ? 'أرض/عقار الوقف' : 'مياه سقي الفلج';
+            const message = `السلام عليكم الفاضل/ ${record.tenant}،\n\nنود تذكيركم بضرورة دفع الآجار السنوي لوقف (${typeLabel}: ${record.name}) لعام ${selectedYear} والبالغ (${record.rent} ر.ع).\n\nنرجو التكرم بالدفع لخدمة بيوت الله والبلدة، وجزاكم الله خيراً وحفظكم الله.`;
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        };
+
+        window.toggleAddForm = function() {
+            const formBody = document.getElementById('add-form-body');
+            const label = document.getElementById('add-form-toggle-label');
+            if (formBody.classList.contains('hidden')) {
+                formBody.classList.remove('hidden');
+                label.textContent = 'إغلاق الاستمارة [-]';
+            } else {
+                formBody.classList.add('hidden');
+                label.textContent = 'فتح الاستمارة [+]';
+            }
+        };
+
+        window.toggleFormWaterFields = function() {
+            const type = document.getElementById('form-type').value;
+            const falajContainer = document.getElementById('form-water-falaj-container');
+            const hoursContainer = document.getElementById('form-water-hours-container');
+            if (type === 'water') {
+                falajContainer.classList.remove('hidden');
+                hoursContainer.classList.remove('hidden');
+            } else {
+                falajContainer.classList.add('hidden');
+                hoursContainer.classList.add('hidden');
+            }
+        };
+
+        window.saveNewContract = function() {
+            const type = document.getElementById('form-type').value;
+            const name = document.getElementById('form-name').value.trim();
+            const tenant = document.getElementById('form-tenant').value.trim();
+            const phone = document.getElementById('form-phone').value.trim();
+            const rent = Number(document.getElementById('form-rent').value);
+            const duration = document.getElementById('form-duration').value.trim();
+            const falaj = document.getElementById('form-falaj').value;
+            const hours = Number(document.getElementById('form-hours').value) || 0;
+
+            if (!name || !tenant || !rent) {
+                alert("يرجى تعبئة كافة الحقول الإلزامية (الاسم، المستأجر، الآجار السنوي)");
+                return;
+            }
+
+            const newId = state.records.length > 0 ? Math.max(...state.records.map(r => r.id)) + 1 : 1;
+            const newContract = {
+                id: newId,
+                type: type,
+                name: name,
+                tenant: tenant,
+                phone: phone || '—',
+                falaj: type === 'water' ? falaj : '—',
+                hours: type === 'water' ? hours : 0,
+                rent: rent,
+                duration: duration || 'غير محدد',
+                payments: baseYears.reduce((acc, year) => ({ ...acc, [year]: false }), {})
+            };
+
+            state.records.push(newContract);
+            render();
+            syncToCloud();
+            window.toggleAddForm();
+
+            // تنظيف الحقول
+            document.getElementById('form-name').value = '';
+            document.getElementById('form-tenant').value = '';
+            document.getElementById('form-phone').value = '';
+            document.getElementById('form-rent').value = '';
+            document.getElementById('form-duration').value = '';
+            document.getElementById('form-hours').value = '';
+        };
+
+        window.updatePurposeName = function(id, val) {
+            state.purposes = state.purposes.map(p => {
+                if (p.id === id) {
+                    return { ...p, name: val };
+                }
+                return p;
+            });
+            render();
+            syncToCloud();
+        };
+
+        window.updatePurposePercent = function(id, val) {
+            state.purposes = state.purposes.map(p => {
+                if (p.id === id) {
+                    return { ...p, percent: Number(val) || 0 };
+                }
+                return p;
+            });
+            render();
+            syncToCloud();
+        };
+
+        window.deletePurpose = function(id) {
+            state.purposes = state.purposes.filter(p => p.id !== id);
+            render();
+            syncToCloud();
+        };
+
+        window.addWaqfPurpose = function() {
+            const newId = state.purposes.length > 0 ? Math.max(...state.purposes.map(p => p.id)) + 1 : 1;
+            state.purposes.push({ id: newId, name: 'مصرف جديد', percent: 0 });
+            render();
+            syncToCloud();
+        };
+
+    </script>
+</body>
+</html>
