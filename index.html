@@ -25,99 +25,34 @@
 </head>
 <body class="bg-emerald-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <!-- شاشة البوابة الرئيسية (Landing / Gate Screen) -->
+    <!-- شاشة البوابة الرئيسية (دخول الإدارة فقط) -->
     <div id="gate-screen" class="flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
-        <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-emerald-700/30 animate-fade-in">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-emerald-700/30 animate-fade-in">
             <div class="bg-emerald-950 p-8 text-center border-b border-emerald-800 text-white relative">
                 <i class="fa-solid fa-mosque text-5xl text-emerald-400 mb-3"></i>
-                <h1 class="text-3xl font-black tracking-tight">أوقاف مساجد بلدة منال</h1>
-                <p class="text-emerald-300 text-sm mt-2 font-medium">البوابة الإلكترونية السحابية لإدارة ومتابعة الأموال الوقفية للبلدة</p>
+                <h1 class="text-3xl font-black tracking-tight">أوقاف بلدة منال</h1>
+                <p class="text-emerald-300 text-sm mt-2 font-medium">نظام إدارة الأموال الوقفية</p>
             </div>
-
-            <div class="p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50">
-                <!-- بطاقة الأهالي والمستأجرين -->
-                <div class="bg-white rounded-xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-                    <div>
-                        <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                            <i class="fa-solid fa-users text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">بوابة الأهالي والمستأجرين</h3>
-                        <p class="text-slate-500 text-xs mt-2 leading-relaxed">
-                            مخصصة لأهالي بلدة منال الكرام والمستأجرين للاطلاع على كشوفات الآجار السنوية، وحالة الدفع المعتمدة، وتفاصيل تقسيم الأموال الوقفية بكل شفافية.
-                        </p>
-                    </div>
-                    <button onclick="showPublicLogin()" class="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all text-sm">
-                        دخول الأهالي والجمهور <i class="fa-solid fa-chevron-left text-xs"></i>
-                    </button>
+            <div class="p-8 bg-slate-50 text-center">
+                <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
                 </div>
-
-                <!-- بطاقة الإدارة ونظار الوقف -->
-                <div class="bg-white rounded-xl border border-slate-150 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-                    <div>
-                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                            <i class="fa-solid fa-lock text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800">بوابة الإدارة ونظّار الوقف</h3>
-                        <p class="text-slate-500 text-xs mt-2 leading-relaxed">
-                            شاشة تحكم خاصة بأعضاء لجنة أوقاف المساجد لتسجيل الاستثمارات الجديدة، وتحديث حالات الدفع، وتعديل نسب توزيع الحاسبة، وإرسال تنبيهات السداد.
-                        </p>
-                    </div>
-                    <button onclick="showAdminLogin()" class="w-full mt-6 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all text-sm">
-                        تسجيل دخول الإدارة <i class="fa-solid fa-chevron-left text-xs"></i>
+                <h2 class="text-xl font-bold text-slate-800 mb-1">تسجيل دخول الإدارة</h2>
+                <p class="text-xs text-slate-500 mb-6">يرجى إدخال الرقم السري للوصول إلى لوحة التحكم</p>
+                
+                <div id="admin-auth-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i> الرمز السري غير صحيح.
+                </div>
+                
+                <div class="space-y-4">
+                    <input type="password" id="admin-password-input" placeholder="الرقم السري (••••••••)" class="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-center" onkeypress="if(event.key === 'Enter') submitAdminLogin()">
+                    <button onclick="submitAdminLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg text-sm transition-all shadow-md">
+                        تأكيد الدخول
                     </button>
                 </div>
             </div>
             <div class="bg-slate-100 px-6 py-4 text-center text-xs text-slate-500 border-t border-slate-200 font-semibold">
-                النظام مرتبط ومؤمن سحابياً بشكل دوري وتلقائي
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة دخول الإدارة (كلمة المرور) -->
-    <div id="admin-login-screen" class="hidden flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div class="bg-slate-900 p-6 text-center text-white">
-                <i class="fa-solid fa-shield-halved text-4xl text-amber-400 mb-2"></i>
-                <h2 class="text-xl font-bold">بوابة نظار الوقف المعتمدة</h2>
-                <p class="text-xs text-slate-400 mt-1 font-medium">يرجى إدخال الرقم السري لتفعيل لوحة التحكم</p>
-            </div>
-            <div class="p-6 space-y-4">
-                <div id="admin-auth-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-xs font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i> الرمز السري غير صحيح. يرجى المحاولة مرة أخرى.
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">الرقم السري للإدارة</label>
-                  <input type="password" id="admin-password-input" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
-                </div>
-                <button onclick="submitAdminLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-lg text-sm transition-all">
-                  تأكيد الدخول الآمن
-                </button>
-                <button onclick="backToGate()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-all">
-                  رجوع للبوابة الرئيسية
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة دخول الناس والأهالي -->
-    <div id="public-login-screen" class="hidden flex-1 flex items-center justify-center p-4 py-12 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div class="bg-emerald-900 p-6 text-center text-white">
-                <i class="fa-solid fa-users text-4xl text-emerald-300 mb-2"></i>
-                <h2 class="text-xl font-bold">بوابة أهالي بلدة منال الكرام</h2>
-                <p class="text-xs text-emerald-200 mt-1 font-medium">مرحباً بكم في نظام العرض المالي والآجارات</p>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">الاسم الكريم (اختياري للترحيب بك)</label>
-                  <input type="text" id="visitor-name-input" placeholder="مثال: أحمد بن ناصر الراشدي" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
-                </div>
-                <button onclick="submitPublicLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-lg text-sm transition-all">
-                  الدخول المباشر للبرنامج
-                </button>
-                <button onclick="backToGate()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-all">
-                  رجوع للبوابة الرئيسية
-                </button>
+                النظام مرتبط ومؤمن سحابياً
             </div>
         </div>
     </div>
@@ -133,9 +68,8 @@
                   <div>
                     <h1 class="text-xl font-black tracking-tight flex items-center gap-2">
                       نظام أوقاف مساجد بلدة منال
-                      <span id="badge-role" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
                     </h1>
-                    <p id="welcome-message" class="text-emerald-200 text-xs mt-0.5 font-medium"></p>
+                    <p class="text-emerald-200 text-xs mt-0.5 font-medium">لوحة تحكم إدارية كاملة للأصول والأملاك الوقفية</p>
                   </div>
                 </div>
 
@@ -399,15 +333,12 @@
                             </div>
                             
                             <div id="admin-toggles-container" class="hidden flex items-center gap-4 bg-emerald-50/50 px-3 py-1.5 rounded-md border border-emerald-100">
-                                <span class="text-xs font-bold text-emerald-800 ml-1">تحكم عرض الجمهور:</span>
+                                <span class="text-xs font-bold text-emerald-800 ml-1">خيارات العرض:</span>
                                 <button onclick="handleToggleOption('names')" id="toggle-names" class="flex items-center gap-1 text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-eye"></i> الأسماء
                                 </button>
                                 <button onclick="handleToggleOption('phones')" id="toggle-phones" class="flex items-center gap-1 text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-eye-slash"></i> الهواتف
-                                </button>
-                                <button onclick="handleToggleOption('payments')" id="toggle-payments" class="flex items-center gap-1 text-xs font-bold transition-colors">
-                                    <i class="fa-solid fa-eye-slash"></i> حالة الدفع
                                 </button>
                             </div>
                         </div>
@@ -425,9 +356,9 @@
                                     <th class="px-6 py-4 whitespace-nowrap text-center">ساعات الماء</th>
                                     <th class="px-6 py-4 whitespace-nowrap text-center">الآجار (ريال)</th>
                                     <th class="px-6 py-4 whitespace-nowrap">مدة العقد</th>
-                                    <th id="th-payments" class="px-6 py-4 whitespace-nowrap text-center hidden">حالة الدفع</th>
-                                    <th id="th-whatsapp" class="px-6 py-4 whitespace-nowrap text-center hidden">تنبيه واتساب</th>
-                                    <th id="th-actions" class="px-6 py-4 whitespace-nowrap text-center hidden">إجراءات</th>
+                                    <th id="th-payments" class="px-6 py-4 whitespace-nowrap text-center">حالة الدفع</th>
+                                    <th id="th-whatsapp" class="px-6 py-4 whitespace-nowrap text-center">تنبيه واتساب</th>
+                                    <th id="th-actions" class="px-6 py-4 whitespace-nowrap text-center">إجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="ledger-table-body" class="divide-y divide-slate-100">
@@ -592,12 +523,9 @@
             })),
             purposes: [...initialPurposes],
             showNames: true,
-            showPhones: false,
-            showPaymentsToPublic: false
+            showPhones: false
         };
 
-        let userRole = null; 
-        let visitorName = '';
         let activeTab = 'dashboard';
         let filterType = 'all'; 
         let selectedYear = 2026;
@@ -664,8 +592,7 @@
                     records: state.records,
                     purposes: state.purposes,
                     showNames: state.showNames,
-                    showPhones: state.showPhones,
-                    showPaymentsToPublic: state.showPaymentsToPublic
+                    showPhones: state.showPhones
                 }, { merge: true });
                 setCloudStatus('synced');
             } catch (error) {
@@ -713,7 +640,6 @@
                                 if (data.purposes) state.purposes = data.purposes;
                                 if (data.showNames !== undefined) state.showNames = data.showNames;
                                 if (data.showPhones !== undefined) state.showPhones = data.showPhones;
-                                if (data.showPaymentsToPublic !== undefined) state.showPaymentsToPublic = data.showPaymentsToPublic;
                                 setCloudStatus('synced');
                                 render();
                             } else {
@@ -722,8 +648,7 @@
                                     records: state.records,
                                     purposes: state.purposes,
                                     showNames: state.showNames,
-                                    showPhones: state.showPhones,
-                                    showPaymentsToPublic: state.showPaymentsToPublic
+                                    showPhones: state.showPhones
                                 }).then(() => {
                                     setCloudStatus('synced');
                                     render();
@@ -800,54 +725,17 @@
             document.getElementById('summary-seeb-hours').textContent = `${sum.seebHours} ساعات ماء`;
             document.getElementById('summary-seeb-rent').textContent = `${sum.seebRent} ر.ع`;
 
-            // 2. تحديث الترويسة حسب مستويات الصلاحيات المفتوحة
-            const badge = document.getElementById('badge-role');
-            const welcome = document.getElementById('welcome-message');
+            // 2. تفعيل الشاشات الخاصة بالإدارة
+            document.getElementById('admin-add-form-container').classList.remove('hidden');
+            document.getElementById('admin-toggles-container').classList.remove('hidden');
+            document.getElementById('admin-distribution-controls').classList.remove('hidden');
+            document.getElementById('public-distribution-view').classList.add('hidden');
             
-            if (userRole === 'admin') {
-                badge.textContent = 'صلاحية مسؤول';
-                badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-amber-400 text-slate-900";
-                welcome.textContent = 'لوحة تحكم إدارية كاملة للأصول والأملاك الوقفية لبلدة منال';
-                
-                // تفعيل شاشات المسؤول بالكامل
-                document.getElementById('admin-add-form-container').classList.remove('hidden');
-                document.getElementById('admin-toggles-container').classList.remove('hidden');
+            // تعديل عرض الأعمدة بحسب خيارات العرض السحابية المقررة
+            if (state.showPhones) {
                 document.getElementById('th-phone').classList.remove('hidden');
-                document.getElementById('th-payments').classList.remove('hidden');
-                document.getElementById('th-whatsapp').classList.remove('hidden');
-                document.getElementById('th-actions').classList.remove('hidden');
-                
-                document.getElementById('admin-distribution-controls').classList.remove('hidden');
-                document.getElementById('public-distribution-view').classList.add('hidden');
             } else {
-                badge.textContent = 'صلاحية زائر';
-                badge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-600 text-white";
-                welcome.textContent = `مرحباً بك${visitorName ? ` الفاضل/ ${visitorName}` : ''}، واجهة عرض الأهالي والزوار للقراءة`;
-
-                // تعطيل وإخفاء شاشات المسؤول
-                document.getElementById('admin-add-form-container').classList.add('hidden');
-                document.getElementById('admin-toggles-container').classList.add('hidden');
-                
-                // تعديل عرض الأعمدة بحسب خيارات العرض السحابية المقررة من المسؤول
-                if (state.showPhones) {
-                    document.getElementById('th-phone').classList.remove('hidden');
-                } else {
-                    document.getElementById('th-phone').classList.add('hidden');
-                }
-
-                if (state.showPaymentsToPublic) {
-                    document.getElementById('th-payments').classList.remove('hidden');
-                    document.getElementById('year-select-container').classList.remove('hidden');
-                } else {
-                    document.getElementById('th-payments').classList.add('hidden');
-                    document.getElementById('year-select-container').classList.add('hidden');
-                }
-
-                document.getElementById('th-whatsapp').classList.add('hidden');
-                document.getElementById('th-actions').classList.add('hidden');
-
-                document.getElementById('admin-distribution-controls').classList.add('hidden');
-                document.getElementById('public-distribution-view').classList.remove('hidden');
+                document.getElementById('th-phone').classList.add('hidden');
             }
 
             // تحديث تصميم أزرار الخيارات الإدارية
@@ -860,21 +748,16 @@
             renderDistributionSection(sum.totalRent);
         }
 
-        // تحديث أزرار خيارات العرض للجمهور وتثبيتها سحابياً
+        // تحديث أزرار خيارات العرض وتثبيتها سحابياً
         function updateToggleButtonsStyle() {
-            if (userRole !== 'admin') return;
             const toggleNames = document.getElementById('toggle-names');
             const togglePhones = document.getElementById('toggle-phones');
-            const togglePayments = document.getElementById('toggle-payments');
 
             toggleNames.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showNames ? 'text-emerald-700' : 'text-slate-400'}`;
             toggleNames.innerHTML = `<i class="fa-solid ${state.showNames ? 'fa-eye' : 'fa-eye-slash'}"></i> الأسماء`;
 
             togglePhones.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showPhones ? 'text-emerald-700' : 'text-slate-400'}`;
             togglePhones.innerHTML = `<i class="fa-solid ${state.showPhones ? 'fa-eye' : 'fa-eye-slash'}"></i> الهواتف`;
-
-            togglePayments.className = `flex items-center gap-1 text-xs font-bold transition-colors ${state.showPaymentsToPublic ? 'text-emerald-700' : 'text-slate-400'}`;
-            togglePayments.innerHTML = `<i class="fa-solid ${state.showPaymentsToPublic ? 'fa-eye' : 'fa-eye-slash'}"></i> حالة الدفع`;
         }
 
         // بناء صفوف الجدول ببيانات دقيقة ومفلترة
@@ -903,10 +786,10 @@
                 tdType.innerHTML = `<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${record.type === 'land' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">${record.type === 'land' ? 'عقد استثمار' : 'عقد إيجار'}</span>`;
                 tr.appendChild(tdType);
 
-                // اسم المستأجر (مشروط بالحماية)
+                // اسم المستأجر
                 const tdTenant = document.createElement('td');
                 tdTenant.className = "px-6 py-4 text-slate-600 font-semibold";
-                if (userRole === 'admin' || state.showNames) {
+                if (state.showNames) {
                     tdTenant.textContent = record.tenant;
                 } else {
                     tdTenant.innerHTML = `<span class="text-slate-400 tracking-widest">••••••••••</span>`;
@@ -914,7 +797,7 @@
                 tr.appendChild(tdTenant);
 
                 // رقم الهاتف
-                if (userRole === 'admin' || state.showPhones) {
+                if (state.showPhones) {
                     const tdPhone = document.createElement('td');
                     tdPhone.className = "px-6 py-4 text-slate-600 dir-ltr font-bold";
                     tdPhone.textContent = record.phone;
@@ -946,45 +829,34 @@
                 tr.appendChild(tdDuration);
 
                 // حالة الدفع للسنوات
-                if (userRole === 'admin' || state.showPaymentsToPublic) {
-                    const tdPayment = document.createElement('td');
-                    tdPayment.className = "px-6 py-4 text-center";
-                    const isPaid = record.payments && record.payments[selectedYear];
+                const tdPayment = document.createElement('td');
+                tdPayment.className = "px-6 py-4 text-center";
+                const isPaid = record.payments && record.payments[selectedYear];
 
-                    if (userRole === 'admin') {
-                        const btnPay = document.createElement('button');
-                        btnPay.className = `inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isPaid ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}`;
-                        btnPay.innerHTML = `<i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}`;
-                        btnPay.onclick = () => window.togglePayment(record.id);
-                        tdPayment.appendChild(btnPay);
-                    } else {
-                        tdPayment.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold ${isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-600 border border-red-200'}"><i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}</span>`;
-                    }
-                    tr.appendChild(tdPayment);
-                }
+                const btnPay = document.createElement('button');
+                btnPay.className = `inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isPaid ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}`;
+                btnPay.innerHTML = `<i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${isPaid ? 'تم الدفع' : 'غير مدفوع'}`;
+                btnPay.onclick = () => window.togglePayment(record.id);
+                tdPayment.appendChild(btnPay);
+                tr.appendChild(tdPayment);
 
                 // تنبيه واتساب
-                if (userRole === 'admin') {
-                    const tdWhatsapp = document.createElement('td');
-                    tdWhatsapp.className = "px-6 py-4 text-center";
-                    const isPaid = record.payments && record.payments[selectedYear];
-                    
-                    const btnWa = document.createElement('button');
-                    btnWa.disabled = isPaid;
-                    btnWa.className = `inline-flex items-center justify-center p-2 rounded-full transition-all ${isPaid ? 'text-slate-300 cursor-not-allowed' : 'text-green-600 hover:bg-green-50 hover:text-green-700'}`;
-                    btnWa.innerHTML = `<i class="fa-solid fa-comment text-lg"></i>`;
-                    btnWa.onclick = () => window.sendWhatsApp(record);
-                    tdWhatsapp.appendChild(btnWa);
-                    tr.appendChild(tdWhatsapp);
-                }
+                const tdWhatsapp = document.createElement('td');
+                tdWhatsapp.className = "px-6 py-4 text-center";
+                
+                const btnWa = document.createElement('button');
+                btnWa.disabled = isPaid;
+                btnWa.className = `inline-flex items-center justify-center p-2 rounded-full transition-all ${isPaid ? 'text-slate-300 cursor-not-allowed' : 'text-green-600 hover:bg-green-50 hover:text-green-700'}`;
+                btnWa.innerHTML = `<i class="fa-solid fa-comment text-lg"></i>`;
+                btnWa.onclick = () => window.sendWhatsApp(record);
+                tdWhatsapp.appendChild(btnWa);
+                tr.appendChild(tdWhatsapp);
 
                 // حذف العقد
-                if (userRole === 'admin') {
-                    const tdDel = document.createElement('td');
-                    tdDel.className = "px-6 py-4 text-center";
-                    tdDel.innerHTML = `<button onclick="window.deleteContract(${record.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors" title="حذف هذا العقد"><i class="fa-solid fa-trash-can"></i></button>`;
-                    tr.appendChild(tdDel);
-                }
+                const tdDel = document.createElement('td');
+                tdDel.className = "px-6 py-4 text-center";
+                tdDel.innerHTML = `<button onclick="window.deleteContract(${record.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors" title="حذف هذا العقد"><i class="fa-solid fa-trash-can"></i></button>`;
+                tr.appendChild(tdDel);
 
                 tableBody.appendChild(tr);
             });
@@ -1086,27 +958,10 @@
 
         // ================= مهام ووظائف التحكم - لربطها بـ HTML =================
 
-        window.showPublicLogin = function() {
-            document.getElementById('gate-screen').classList.add('hidden');
-            document.getElementById('public-login-screen').classList.remove('hidden');
-        };
-
-        window.showAdminLogin = function() {
-            document.getElementById('gate-screen').classList.add('hidden');
-            document.getElementById('admin-login-screen').classList.remove('hidden');
-        };
-
-        window.backToGate = function() {
-            document.getElementById('public-login-screen').classList.add('hidden');
-            document.getElementById('admin-login-screen').classList.add('hidden');
-            document.getElementById('gate-screen').classList.remove('hidden');
-        };
-
         window.submitAdminLogin = function() {
             const pass = document.getElementById('admin-password-input').value;
             if (pass === 'akm1983') {
-                userRole = 'admin';
-                document.getElementById('admin-login-screen').classList.add('hidden');
+                document.getElementById('gate-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
                 document.getElementById('admin-password-input').value = '';
                 document.getElementById('admin-auth-error').classList.add('hidden');
@@ -1116,20 +971,9 @@
             }
         };
 
-        window.submitPublicLogin = function() {
-            userRole = 'public';
-            visitorName = document.getElementById('visitor-name-input').value.trim();
-            document.getElementById('public-login-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            render();
-        };
-
         window.handleLogout = function() {
-            userRole = null;
-            visitorName = '';
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('gate-screen').classList.remove('hidden');
-            document.getElementById('visitor-name-input').value = '';
         };
 
         window.switchTab = function(tabId) {
@@ -1166,8 +1010,6 @@
                 state.showNames = !state.showNames;
             } else if (type === 'phones') {
                 state.showPhones = !state.showPhones;
-            } else if (type === 'payments') {
-                state.showPaymentsToPublic = !state.showPaymentsToPublic;
             }
             render();
             syncToCloud();
