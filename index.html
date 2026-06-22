@@ -21,6 +21,43 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        
+        /* إعدادات مخصصة لطباعة التقارير وإخفاء باقي الموقع */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                direction: rtl;
+                background-color: white;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                font-size: 12px;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #cbd5e1;
+                padding: 8px;
+                text-align: right;
+            }
+            .print-table th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }
     </style>
 </head>
 <body class="bg-emerald-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -31,7 +68,7 @@
             <div class="bg-emerald-950 p-8 text-center border-b border-emerald-800 text-white relative">
                 <i class="fa-solid fa-mosque text-5xl text-emerald-400 mb-3"></i>
                 <h1 class="text-3xl font-black tracking-tight">أوقاف بلدة منال</h1>
-                <p class="text-emerald-300 text-sm mt-2 font-medium">نظام إدارة الأموال الوقفية</p>
+                <p class="text-emerald-300 text-sm mt-2 font-medium">نظام الإدارة المالية والأملاك الوقفية</p>
             </div>
             <div class="p-8 bg-slate-50 text-center">
                 <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -94,13 +131,19 @@
             <div class="container mx-auto px-4">
               <div class="flex gap-1 overflow-x-auto hide-scrollbar">
                 <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-emerald-700 border-b-2 border-emerald-700 bg-emerald-50/50">
-                  <i class="fa-solid fa-chart-pie"></i> لوحة المؤشرات العامة
+                  <i class="fa-solid fa-chart-pie"></i> لوحة المؤشرات المالية
                 </button>
                 <button onclick="switchTab('ledger')" id="btn-tab-ledger" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
-                  <i class="fa-solid fa-list-check"></i> سجل الآجار والعقود المشترك
+                  <i class="fa-solid fa-list-check"></i> سجل العقود والآجار
+                </button>
+                <button onclick="switchTab('expenses')" id="btn-tab-expenses" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
+                  <i class="fa-solid fa-money-bill-transfer"></i> سجل المصروفات
                 </button>
                 <button onclick="switchTab('distribution')" id="btn-tab-distribution" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
-                  <i class="fa-solid fa-calculator"></i> حاسبة تقسيم الأوقاف
+                  <i class="fa-solid fa-calculator"></i> حاسبة التوزيع
+                </button>
+                <button onclick="switchTab('reports')" id="btn-tab-reports" class="flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50">
+                  <i class="fa-solid fa-file-pdf"></i> التقارير والطباعة
                 </button>
               </div>
             </div>
@@ -128,63 +171,63 @@
             <!-- 1. تبويب المؤشرات -->
             <div id="tab-dashboard-content" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- كارد الإجمالي العام السنوي -->
+                    <!-- كارد الرصيد الفعلي -->
                     <div class="bg-emerald-800 text-white rounded-xl shadow-md p-6 flex items-start gap-4 relative overflow-hidden">
                         <div class="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-10">
-                            <i class="fa-solid fa-coins text-8xl"></i>
+                            <i class="fa-solid fa-wallet text-8xl"></i>
                         </div>
                         <div class="p-3 bg-white/10 rounded-lg relative z-10">
-                            <i class="fa-solid fa-chart-line text-2xl text-emerald-300"></i>
+                            <i class="fa-solid fa-vault text-2xl text-emerald-300"></i>
                         </div>
                         <div class="relative z-10">
-                            <p class="text-sm text-emerald-100 font-medium">الإجمالي العام السنوي</p>
-                            <h3 class="text-3xl font-extrabold mt-1"><span id="summary-total-rent">0</span> <span class="text-sm font-normal text-emerald-200">ر.ع</span></h3>
-                            <p class="text-xs text-emerald-200 mt-2">عقود الإيجار + عقود الاستثمار</p>
+                            <p class="text-sm text-emerald-100 font-bold">الرصيد الفعلي المتاح في الصندوق</p>
+                            <h3 class="text-3xl font-extrabold mt-1"><span id="summary-current-balance">0</span> <span class="text-sm font-normal text-emerald-200">ر.ع</span></h3>
+                            <p class="text-xs text-emerald-200 mt-2 font-medium">إجمالي المحصل ناقصاً المصروفات</p>
                         </div>
                     </div>
 
-                    <!-- كارد إيرادات العقارات والأراضي -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
-                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg">
-                            <i class="fa-solid fa-map-location-dot text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-500 font-medium">عقود الاستثمار (أراضي وعقارات)</p>
-                            <h3 class="text-2xl font-bold text-indigo-700 mt-1"><span id="summary-land-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
-                            <p class="text-xs text-slate-400 mt-1">القطع السكنية والتجارية والزراعية</p>
-                        </div>
-                    </div>
-
-                    <!-- كارد إيرادات سقي مياه الأفلاج -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
-                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
-                            <i class="fa-solid fa-droplet text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-500 font-medium">عقود الإيجار (أوقاف المياه)</p>
-                            <h3 class="text-2xl font-bold text-emerald-700 mt-1"><span id="summary-water-rent">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
-                            <p class="text-xs text-slate-400 mt-1">آجار سقي الأفلاج السنوي</p>
-                        </div>
-                    </div>
-
-                    <!-- كارد مجموع ساعات الماء -->
+                    <!-- كارد إجمالي الإيرادات المحصلة -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
                         <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
-                            <i class="fa-solid fa-clock text-2xl"></i>
+                            <i class="fa-solid fa-hand-holding-dollar text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">مجموع ساعات الماء</p>
-                            <h3 class="text-2xl font-bold text-blue-700 mt-1"><span id="summary-total-hours">0</span> <span class="text-sm font-normal text-slate-500">ساعة</span></h3>
-                            <p class="text-xs text-slate-400 mt-1">موزعة بين فلجي الأسفل والسيب</p>
+                            <p class="text-sm text-slate-500 font-bold">إجمالي الإيرادات المحصلة</p>
+                            <h3 class="text-2xl font-bold text-blue-700 mt-1"><span id="summary-total-collected">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
+                            <p class="text-xs text-slate-400 mt-1 font-medium">مجموع كل الآجارات المسددة فعلياً</p>
+                        </div>
+                    </div>
+
+                    <!-- كارد إجمالي المصروفات -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
+                        <div class="p-3 bg-red-100 text-red-600 rounded-lg">
+                            <i class="fa-solid fa-money-bill-transfer text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 font-bold">إجمالي المصروفات والسحوبات</p>
+                            <h3 class="text-2xl font-bold text-red-700 mt-1"><span id="summary-total-expenses">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
+                            <p class="text-xs text-slate-400 mt-1 font-medium">إجمالي ما تم سحبه لأغراض الوقف</p>
+                        </div>
+                    </div>
+
+                    <!-- كارد الإجمالي السنوي المتوقع -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-start gap-4">
+                        <div class="p-3 bg-slate-100 text-slate-600 rounded-lg">
+                            <i class="fa-solid fa-chart-line text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 font-bold">الآجار السنوي المتوقع (مياه+عقارات)</p>
+                            <h3 class="text-2xl font-bold text-slate-700 mt-1"><span id="summary-annual-expected">0</span> <span class="text-sm font-normal text-slate-500">ر.ع</span></h3>
+                            <p class="text-xs text-slate-400 mt-1 font-medium">قيمة العقود السنوية مجتمعة لسنة واحدة</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- تشارت مقارنة مصادر الأوقاف -->
+                    <!-- تشارت مقارنة مصادر الأوقاف المتوقعة -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                         <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <i class="fa-solid fa-pie-chart text-emerald-600"></i> نسبة الإيرادات حسب مصدر الأوقاف
+                            <i class="fa-solid fa-pie-chart text-emerald-600"></i> نسبة العقود حسب مصدر الوقف (سنوياً)
                         </h4>
                         <div class="space-y-6">
                             <div>
@@ -214,7 +257,7 @@
                     <!-- تفاصيل ريع مياه الأفلاج -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                         <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <i class="fa-solid fa-tint text-blue-600"></i> توزيع ريع مياه الأفلاج (الأسفل وسقي السيب)
+                            <i class="fa-solid fa-tint text-blue-600"></i> توزيع ريع مياه الأفلاج المتوقع (الأسفل وسقي السيب)
                         </h4>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
@@ -243,8 +286,8 @@
 
             <!-- 2. تبويب سجل الآجار والعقود -->
             <div id="tab-ledger-content" class="hidden space-y-6">
-                <!-- شاشة إضافة عقد جديد (للمسؤول فقط) -->
-                <div id="admin-add-form-container" class="hidden bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
+                <!-- شاشة إضافة عقد جديد -->
+                <div id="admin-add-form-container" class="bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
                     <button onclick="toggleAddForm()" class="w-full px-6 py-4 bg-emerald-800 text-white flex justify-between items-center font-bold hover:bg-emerald-900 transition-colors">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-plus"></i> إضافة عقد / استثمار وقفي جديد (يُحفظ تلقائياً في السحابة)
@@ -256,7 +299,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">نوع الاستثمار الوقفي</label>
-                                <select id="form-type" onchange="toggleFormWaterFields()" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <select id="form-type" onchange="toggleFormWaterFields()" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                                     <option value="land">عقد استثمار (أرض / عقار)</option>
                                     <option value="water">عقد إيجار (مياه أفلاج)</option>
                                 </select>
@@ -264,32 +307,32 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">اسم الوقف / الأرض</label>
-                                <input type="text" id="form-name" placeholder="مثل: أرض الوقف رقم 10" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="form-name" placeholder="مثل: أرض الوقف رقم 10" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستأجر</label>
-                                <input type="text" id="form-tenant" placeholder="الاسم الثلاثي والقبيلة" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="form-tenant" placeholder="الاسم الثلاثي والقبيلة" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">رقم الهاتف</label>
-                                <input type="text" id="form-phone" placeholder="9xxxxxxx" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="form-phone" placeholder="9xxxxxxx" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">مبلغ الآجار السنوي (ر.ع)</label>
-                                <input type="number" id="form-rent" placeholder="مثال: 150" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="number" id="form-rent" placeholder="مثال: 150" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 mb-1">مدة العقد</label>
-                                <input type="text" id="form-duration" placeholder="مثال: 10 سنوات" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="form-duration" placeholder="مثال: 10 سنوات" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
 
                             <div id="form-water-falaj-container" class="hidden">
                                 <label class="block text-xs font-bold text-slate-600 mb-1">سقي الفلج</label>
-                                <select id="form-falaj" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <select id="form-falaj" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                                     <option value="الأسفل">الأسفل</option>
                                     <option value="السيب">السيب</option>
                                 </select>
@@ -297,7 +340,7 @@
 
                             <div id="form-water-hours-container" class="hidden">
                                 <label class="block text-xs font-bold text-slate-600 mb-1">ساعات الماء</label>
-                                <input type="number" id="form-hours" placeholder="مثال: 2" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="number" id="form-hours" placeholder="مثال: 2" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold">
                             </div>
                         </div>
                         <div class="flex justify-end mt-6">
@@ -332,7 +375,7 @@
                                 </select>
                             </div>
                             
-                            <div id="admin-toggles-container" class="hidden flex items-center gap-4 bg-emerald-50/50 px-3 py-1.5 rounded-md border border-emerald-100">
+                            <div id="admin-toggles-container" class="flex items-center gap-4 bg-emerald-50/50 px-3 py-1.5 rounded-md border border-emerald-100">
                                 <span class="text-xs font-bold text-emerald-800 ml-1">خيارات العرض:</span>
                                 <button onclick="handleToggleOption('names')" id="toggle-names" class="flex items-center gap-1 text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-eye"></i> الأسماء
@@ -369,22 +412,95 @@
                 </div>
             </div>
 
-            <!-- 3. تبويب حاسبة التقسيم -->
+            <!-- 3. تبويب سجل المصروفات والمسحوبات -->
+            <div id="tab-expenses-content" class="hidden space-y-6">
+                <!-- إضافة مصروف جديد -->
+                <div class="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden">
+                    <button onclick="toggleExpenseForm()" class="w-full px-6 py-4 bg-red-800 text-white flex justify-between items-center font-bold hover:bg-red-900 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-minus"></i> سحب مبلغ للمصروفات (يُخصم من إجمالي الوقف العام)
+                        </span>
+                        <span id="expense-form-toggle-label">فتح الاستمارة [+]</span>
+                    </button>
+                    
+                    <div id="expense-form-body" class="hidden p-6 border-t border-slate-100 bg-slate-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">المبلغ المسحوب (ر.ع)</label>
+                                <input type="number" id="exp-amount" placeholder="مثال: 50" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-red-600">
+                            </div>
+
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-slate-600 mb-1">الغرض من السحب (المصرف)</label>
+                                <select id="exp-purpose" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 font-bold">
+                                    <!-- سيتم الملء من قائمة المصارف -->
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-slate-600 mb-1">تاريخ السحب</label>
+                                <input type="date" id="exp-date" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 font-bold">
+                            </div>
+
+                            <div class="md:col-span-4">
+                                <label class="block text-xs font-bold text-slate-600 mb-1">تفاصيل وملاحظات (أين صُرف المبلغ؟)</label>
+                                <input type="text" id="exp-note" placeholder="مثال: شراء مصابيح للمسجد / دفع راتب الإمام لشهر كذا" class="w-full bg-white border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 font-bold">
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-6">
+                            <button onclick="saveNewExpense()" class="bg-red-700 hover:bg-red-800 text-white px-6 py-2.5 rounded-md font-bold transition-all">
+                                تأكيد السحب وخصم المبلغ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- جدول المصروفات -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-wrap gap-4 items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800 text-red-800">سجل المصروفات والمسحوبات</h2>
+                            <p class="text-xs text-slate-500 mt-1 font-medium">كشف بجميع المبالغ التي تم سحبها من صندوق الأوقاف</p>
+                        </div>
+                        <div class="bg-red-50 text-red-800 px-4 py-2 rounded-lg border border-red-100 font-bold text-sm">
+                            إجمالي المصروفات: <span id="table-total-expenses">0</span> ر.ع
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 whitespace-nowrap">التاريخ</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">الغرض (المصرف)</th>
+                                    <th class="px-6 py-4 whitespace-nowrap">تفاصيل الصرف</th>
+                                    <th class="px-6 py-4 whitespace-nowrap text-center">المبلغ المسحوب</th>
+                                    <th class="px-6 py-4 whitespace-nowrap text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-table-body" class="divide-y divide-slate-100">
+                                <!-- سيتم الملء ديناميكياً -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. تبويب حاسبة التقسيم -->
             <div id="tab-distribution-content" class="hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- إما لوحة تحكم التعديل (للإدارة) أو شاشة العرض (للناس) -->
                     <div class="lg:col-span-2 space-y-6">
                         <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                             
                             <!-- محتوى المسؤول (إمكانية التعديل) -->
-                            <div id="admin-distribution-controls" class="hidden">
+                            <div id="admin-distribution-controls">
                                 <div class="flex justify-between items-center mb-6">
                                     <div>
                                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                                             <i class="fa-solid fa-calculator text-emerald-600"></i> لوحة التحكم بمصارف ونسب الوقف ببلدة منال
                                         </h2>
-                                        <p class="text-xs text-slate-500 mt-1 font-medium">بصفتك مسؤولاً، يمكنك تعديل المصارف والنسب المئوية لتقسيم الإيرادات العامة.</p>
+                                        <p class="text-xs text-slate-500 mt-1 font-medium">تُحسب المبالغ وتُقسم بناءً على الرصيد الفعلي المتاح بالصندوق.</p>
                                     </div>
                                     <button onclick="addWaqfPurpose()" class="text-sm flex items-center gap-1 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-md hover:bg-emerald-100 transition-colors font-bold">
                                         <i class="fa-solid fa-plus"></i> إضافة مصرف
@@ -409,34 +525,15 @@
                                     <span id="total-percent-value" class="text-xl">0%</span>
                                 </div>
                             </div>
-
-                            <!-- محتوى العامة (اطلاع وقراءة فقط) -->
-                            <div id="public-distribution-view">
-                                <div class="mb-6 border-b border-slate-100 pb-4">
-                                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <i class="fa-solid fa-calculator text-emerald-600"></i> بيان توزيع ريع الأوقاف المعتمد لبلدة منال
-                                    </h2>
-                                    <p class="text-sm text-slate-500 mt-1 font-medium">توزيع آلي وشامل لجميع إيرادات الأوقاف (المياه + الأراضي المستثمرة) تلبيةً لشروط الوقف الشرعية المقررة.</p>
-                                </div>
-
-                                <div id="public-purposes-bars" class="space-y-6">
-                                    <!-- سيتم ملؤه ديناميكياً بقوالب ملوّنة وجذابة -->
-                                </div>
-
-                                <div class="mt-6 p-4 bg-emerald-50/50 rounded-lg text-xs text-emerald-800 border border-emerald-100/50 leading-relaxed font-medium">
-                                    * تُحسب المبالغ الموزعة أعلاه ديناميكياً وتلقائياً بناءً على إجمالي عقود الأوقاف والآجارات النشطة البالغة <strong id="distribution-total-text">0 ر.ع</strong> (تجمع بين عقود الإيجار وعقود الاستثمار) وبحسب النسب المقررة من لجنة الأوقاف.
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
                     <!-- بطاقة عرض الحصص المالية الموزعة -->
                     <div class="lg:col-span-1 space-y-6">
-                        <div class="bg-emerald-800 text-white rounded-xl shadow-lg p-6 relative overflow-hidden">
+                        <div class="bg-emerald-800 text-white rounded-xl shadow-lg p-6 relative overflow-hidden border-2 border-emerald-400">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
                             
-                            <h3 class="text-emerald-100 text-sm font-medium mb-1">المبلغ الإجمالي السنوي الخاضع للتقسيم</h3>
+                            <h3 class="text-emerald-100 text-sm font-bold mb-1">الرصيد الفعلي المتاح للتقسيم</h3>
                             <div class="text-4xl font-extrabold mb-4"><span id="dist-card-total">0</span> <span class="text-lg font-normal opacity-80">ر.ع</span></div>
                             
                             <div class="w-full bg-emerald-900/50 rounded-full h-1.5 mb-6">
@@ -444,15 +541,15 @@
                             </div>
 
                             <div class="space-y-4 relative z-10">
-                                <h4 class="font-bold border-b border-emerald-700/50 pb-2 text-sm text-emerald-200">حصص التوزيع السنوية:</h4>
+                                <h4 class="font-bold border-b border-emerald-700/50 pb-2 text-sm text-emerald-200">الحصص الفعلية المتاحة الآن:</h4>
                                 <div id="dist-card-shares-list" class="space-y-3">
                                     <!-- سيتم ملؤه ديناميكياً -->
                                 </div>
                             </div>
                             
-                            <div id="dist-card-sum-container" class="mt-6 pt-4 border-t border-emerald-700/50 flex justify-between items-center font-bold text-base">
-                                <span>إجمالي ريع مجمع الأوقاف</span>
-                                <span id="dist-card-sum-val">0 ر.ع</span>
+                            <div class="mt-6 pt-4 border-t border-emerald-700/50 flex flex-col gap-1 font-medium text-xs text-emerald-100/80">
+                                * تم حساب التوزيع على أساس:
+                                <span class="block">الإيرادات المحصلة - إجمالي المسحوبات = الرصيد الفعلي.</span>
                             </div>
                         </div>
                     </div>
@@ -460,7 +557,45 @@
                 </div>
             </div>
 
+            <!-- 5. تبويب التقارير والطباعة -->
+            <div id="tab-reports-content" class="hidden space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-8">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2 border-b pb-4"><i class="fa-solid fa-print text-emerald-600 ml-2"></i> إصدار التقارير وطباعتها (PDF)</h2>
+                    <p class="text-sm text-slate-500 mb-6">حدد نوع التقرير والسنة المالية المطلوبة، ثم اضغط على "إصدار التقرير" ليتم تجهيزه لك للطباعة أو الحفظ كملف PDF.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">اختر نوع التقرير:</label>
+                            <select id="report-type" class="w-full bg-white border border-slate-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+                                <option value="all">تقرير مالي شامل (إيرادات، مصروفات، وحصص)</option>
+                                <option value="revenues">تقرير الإيرادات وعقود الآجار المحصلة فقط</option>
+                                <option value="expenses">تقرير سجل المصروفات والمسحوبات فقط</option>
+                                <option value="distribution">تقرير حصص التوزيع الصافية فقط</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">اختر السنة المالية:</label>
+                            <select id="report-year" class="w-full bg-white border border-slate-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+                                <option value="all">جميع السنوات المسجلة (تراكمي)</option>
+                                <!-- سيتم ملء السنوات ديناميكياً -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="generateAndPrintReport()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i> إصدار وطباعة التقرير
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </main>
+    </div>
+
+    <!-- حاوية مخفية للطباعة فقط -->
+    <div id="print-area" class="hidden">
+        <!-- سيتم توليد محتوى التقرير هنا ديناميكياً بواسطة الجافاسكريبت -->
     </div>
 
     <!-- تذييل الصفحة الموحد -->
@@ -470,7 +605,6 @@
 
     <!-- ================= الـ JavaScript التفاعلي وقاعدة البيانات السحابية ================= -->
     <script type="module">
-        // استيراد أدوات قاعدة البيانات السحابية المحدثة للإصدار الأحدث
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
@@ -522,6 +656,7 @@
                 payments: baseYears.reduce((acc, year) => ({ ...acc, [year]: false }), {})
             })),
             purposes: [...initialPurposes],
+            expenses: [], // مصفوفة لتخزين المصروفات
             showNames: true,
             showPhones: false
         };
@@ -580,17 +715,17 @@
             }
         }
 
-        // الحفظ السحابي التلقائي (تطبيق دقيق للمسارات)
+        // الحفظ السحابي التلقائي
         async function syncToCloud() {
             if (!db || !currentUser) return; 
             isSaving = true;
             setCloudStatus('synced');
             try {
-                // استخدام مسار آمن ومطابق بالكامل: /artifacts/{appId}/public/data/{collectionName}
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'state');
                 await setDoc(docRef, {
                     records: state.records,
                     purposes: state.purposes,
+                    expenses: state.expenses,
                     showNames: state.showNames,
                     showPhones: state.showPhones
                 }, { merge: true });
@@ -607,16 +742,26 @@
         window.addEventListener('DOMContentLoaded', () => {
             // ملء قائمة السنوات
             const yearSelect = document.getElementById('year-select');
+            const reportYearSelect = document.getElementById('report-year'); // للتقارير
+            
             baseYears.forEach(year => {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
                 yearSelect.appendChild(option);
+                
+                // إضافة السنوات لتبويب التقارير
+                const rOption = document.createElement('option');
+                rOption.value = year;
+                rOption.textContent = `عام ${year}`;
+                reportYearSelect.appendChild(rOption);
             });
+
+            // تعيين تاريخ اليوم في حقل تسجيل المصروف
+            document.getElementById('exp-date').valueAsDate = new Date();
 
             setCloudStatus('connecting');
 
-            // إكمال المصادقة أولاً قبل أي استعلام (القاعدة الثالثة)
             const initAuth = async () => {
                 try {
                     await signInAnonymously(auth);
@@ -631,22 +776,22 @@
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
-                        // مسار الاستعلام السحابي المطابق للقواعد
                         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'state');
                         onSnapshot(docRef, (docSnap) => {
                             if (docSnap.exists()) {
                                 const data = docSnap.data();
                                 if (data.records) state.records = data.records;
                                 if (data.purposes) state.purposes = data.purposes;
+                                if (data.expenses) state.expenses = data.expenses; else state.expenses = [];
                                 if (data.showNames !== undefined) state.showNames = data.showNames;
                                 if (data.showPhones !== undefined) state.showPhones = data.showPhones;
                                 setCloudStatus('synced');
                                 render();
                             } else {
-                                // تهيئة المستند الأول على السحابة ببيانات بلدة منال
                                 setDoc(docRef, {
                                     records: state.records,
                                     purposes: state.purposes,
+                                    expenses: state.expenses,
                                     showNames: state.showNames,
                                     showPhones: state.showPhones
                                 }).then(() => {
@@ -669,9 +814,12 @@
             });
         });
 
-        // ================= العمليات الحسابية لمجمع الإيرادات =================
+        // ================= العمليات الحسابية الشاملة للوقف =================
         const calculateSummary = () => {
-            let totalRent = 0;
+            let annualExpectedRent = 0; // الإجمالي المتوقع في سنة واحدة
+            let totalCollected = 0; // إجمالي كل الدفعات لجميع السنوات
+            let totalExpenses = 0; // إجمالي ما تم صرفه وسحبه
+
             let totalHours = 0;
             let waterRent = 0;
             let landRent = 0;
@@ -679,38 +827,67 @@
             let seebRent = 0, seebHours = 0;
 
             state.records.forEach(r => {
-                totalRent += Number(r.rent) || 0;
+                const rent = Number(r.rent) || 0;
+                annualExpectedRent += rent;
+                
+                // حساب كل ما تم دفعه في كافة السنوات لهذا العقد
+                if (r.payments) {
+                    Object.values(r.payments).forEach(isPaid => {
+                        if (isPaid) totalCollected += rent;
+                    });
+                }
+
                 if (r.type === 'water') {
-                    waterRent += Number(r.rent) || 0;
+                    waterRent += rent;
                     totalHours += Number(r.hours) || 0;
                     if (r.falaj === 'الأسفل') {
-                        asfalRent += Number(r.rent) || 0;
+                        asfalRent += rent;
                         asfalHours += Number(r.hours) || 0;
                     } else if (r.falaj === 'السيب') {
-                        seebRent += Number(r.rent) || 0;
+                        seebRent += rent;
                         seebHours += Number(r.hours) || 0;
                     }
                 } else if (r.type === 'land') {
-                    landRent += Number(r.rent) || 0;
+                    landRent += rent;
                 }
             });
 
-            return { totalRent, totalHours, waterRent, landRent, asfalRent, asfalHours, seebRent, seebHours };
+            // حساب المسحوبات
+            state.expenses.forEach(exp => {
+                totalExpenses += Number(exp.amount) || 0;
+            });
+
+            // الرصيد الفعلي في الصندوق = ما تم تحصيله ناقصاً ما تم صرفه
+            let currentBalance = totalCollected - totalExpenses;
+
+            return { 
+                annualExpectedRent, 
+                totalCollected, 
+                totalExpenses, 
+                currentBalance, 
+                totalHours, 
+                waterRent, 
+                landRent, 
+                asfalRent, 
+                asfalHours, 
+                seebRent, 
+                seebHours 
+            };
         };
 
         // ================= واجهة العرض والتحديث التفاعلي =================
         function render() {
             const sum = calculateSummary();
 
-            // 1. لوحة المؤشرات
-            document.getElementById('summary-total-rent').textContent = sum.totalRent;
-            document.getElementById('summary-land-rent').textContent = sum.landRent;
-            document.getElementById('summary-water-rent').textContent = sum.waterRent;
-            document.getElementById('summary-total-hours').textContent = sum.totalHours;
+            // 1. تحديث لوحة المؤشرات
+            document.getElementById('summary-current-balance').textContent = sum.currentBalance;
+            document.getElementById('summary-total-collected').textContent = sum.totalCollected;
+            document.getElementById('summary-total-expenses').textContent = sum.totalExpenses;
+            document.getElementById('summary-annual-expected').textContent = sum.annualExpectedRent;
 
-            // النسب المئوية في لوحة المؤشرات
-            const landPct = sum.totalRent > 0 ? ((sum.landRent / sum.totalRent) * 100).toFixed(1) : 0;
-            const waterPct = sum.totalRent > 0 ? ((sum.waterRent / sum.totalRent) * 100).toFixed(1) : 0;
+            // النسب المئوية في لوحة المؤشرات المتوقعة سنوياً
+            const landPct = sum.annualExpectedRent > 0 ? ((sum.landRent / sum.annualExpectedRent) * 100).toFixed(1) : 0;
+            const waterPct = sum.annualExpectedRent > 0 ? ((sum.waterRent / sum.annualExpectedRent) * 100).toFixed(1) : 0;
 
             document.getElementById('land-rent-percent').textContent = `${landPct}%`;
             document.getElementById('land-rent-bar').style.width = `${landPct}%`;
@@ -725,27 +902,17 @@
             document.getElementById('summary-seeb-hours').textContent = `${sum.seebHours} ساعات ماء`;
             document.getElementById('summary-seeb-rent').textContent = `${sum.seebRent} ر.ع`;
 
-            // 2. تفعيل الشاشات الخاصة بالإدارة
-            document.getElementById('admin-add-form-container').classList.remove('hidden');
-            document.getElementById('admin-toggles-container').classList.remove('hidden');
-            document.getElementById('admin-distribution-controls').classList.remove('hidden');
-            document.getElementById('public-distribution-view').classList.add('hidden');
-            
-            // تعديل عرض الأعمدة بحسب خيارات العرض السحابية المقررة
-            if (state.showPhones) {
-                document.getElementById('th-phone').classList.remove('hidden');
-            } else {
-                document.getElementById('th-phone').classList.add('hidden');
-            }
-
             // تحديث تصميم أزرار الخيارات الإدارية
             updateToggleButtonsStyle();
 
             // 3. رندرة قائمة وجدول العقود
-            renderLedgerTable(sum.totalRent);
+            renderLedgerTable();
 
-            // 4. رندرة التوزيع والحصص المخصصة في الحاسبة
-            renderDistributionSection(sum.totalRent);
+            // 4. رندرة جدول المصروفات
+            renderExpensesTable(sum.totalExpenses);
+
+            // 5. رندرة التوزيع والحصص المخصصة في الحاسبة (بناءً على الرصيد الفعلي)
+            renderDistributionSection(sum.currentBalance);
         }
 
         // تحديث أزرار خيارات العرض وتثبيتها سحابياً
@@ -761,7 +928,7 @@
         }
 
         // بناء صفوف الجدول ببيانات دقيقة ومفلترة
-        function renderLedgerTable(totalRent) {
+        function renderLedgerTable() {
             const tableBody = document.getElementById('ledger-table-body');
             tableBody.innerHTML = '';
 
@@ -862,10 +1029,47 @@
             });
         }
 
-        // بناء حاسبة التوزيع والحصص التلقائية
-        function renderDistributionSection(totalRent) {
-            document.getElementById('dist-card-total').textContent = totalRent;
-            document.getElementById('distribution-total-text').textContent = `${totalRent} ر.ع`;
+        // بناء جدول المصروفات
+        function renderExpensesTable(totalExpenses) {
+            document.getElementById('table-total-expenses').textContent = totalExpenses;
+            const tableBody = document.getElementById('expenses-table-body');
+            tableBody.innerHTML = '';
+
+            // تحديث قائمة الأغراض (المصارف) في دروب داون إضافة المصروف
+            const expPurposeSelect = document.getElementById('exp-purpose');
+            expPurposeSelect.innerHTML = '';
+            state.purposes.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.name;
+                opt.textContent = p.name;
+                expPurposeSelect.appendChild(opt);
+            });
+
+            // ترتيب المصروفات من الأحدث للأقدم
+            const sortedExpenses = [...state.expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedExpenses.forEach(exp => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-red-50/50 transition-colors";
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-600">${exp.date}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${exp.purpose}</td>
+                    <td class="px-6 py-4 text-slate-600">${exp.note}</td>
+                    <td class="px-6 py-4 text-center font-extrabold text-red-700 text-base">${exp.amount}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="window.deleteExpense(${exp.id})" class="text-red-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-100 transition-colors" title="حذف السجل">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // بناء حاسبة التوزيع والحصص التلقائية (بناءً على الرصيد الفعلي)
+        function renderDistributionSection(currentBalance) {
+            document.getElementById('dist-card-total').textContent = currentBalance;
 
             const totalPct = state.purposes.reduce((acc, p) => acc + p.percent, 0);
             const distProgress = document.getElementById('dist-card-progress');
@@ -892,22 +1096,18 @@
             const sharesList = document.getElementById('dist-card-shares-list');
             sharesList.innerHTML = '';
             state.purposes.forEach(p => {
-                const amount = (totalRent * (p.percent / 100)).toFixed(2);
+                const amount = (currentBalance * (p.percent / 100)).toFixed(2);
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center text-sm";
                 div.innerHTML = `
                     <span class="text-emerald-50 flex items-center gap-2 font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                        ${p.name} (${p.percent})
+                        ${p.name} (${p.percent}%)
                     </span>
                     <span class="font-extrabold">${amount} ر.ع</span>
                 `;
-                // تجنب أي خلل وتصحيح كتابة اسم المصرف والنسبة المئوية
-                div.querySelector('span').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> ${p.name} (${p.percent}%)`;
                 sharesList.appendChild(div);
             });
-
-            document.getElementById('dist-card-sum-val').textContent = `${totalRent.toFixed(2)} ر.ع`;
 
             // بناء واجهة الإدارة (تعديل الأغراض والنسب)
             const adminPurposesList = document.getElementById('admin-purposes-list');
@@ -931,28 +1131,6 @@
                     </div>
                 `;
                 adminPurposesList.appendChild(div);
-            });
-
-            // بناء واجهة الأهالي (مخططات العرض والشفافية)
-            const publicPurposesBars = document.getElementById('public-purposes-bars');
-            publicPurposesBars.innerHTML = '';
-            state.purposes.forEach(p => {
-                const amount = (totalRent * (p.percent / 100)).toFixed(2);
-                const div = document.createElement('div');
-                div.className = "bg-slate-50 p-4 rounded-xl border border-slate-100";
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-800 text-base">${p.name}</span>
-                        <div class="text-left">
-                            <span class="text-emerald-700 font-extrabold text-lg">${amount} ر.ع</span>
-                            <span class="text-xs text-slate-400 block font-semibold">بنسبة ${p.percent}%</span>
-                        </div>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-3">
-                        <div class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width: ${p.percent}%"></div>
-                    </div>
-                `;
-                publicPurposesBars.appendChild(div);
             });
         }
 
@@ -980,11 +1158,15 @@
             activeTab = tabId;
             document.getElementById('tab-dashboard-content').classList.add('hidden');
             document.getElementById('tab-ledger-content').classList.add('hidden');
+            document.getElementById('tab-expenses-content').classList.add('hidden');
             document.getElementById('tab-distribution-content').classList.add('hidden');
+            document.getElementById('tab-reports-content').classList.add('hidden');
 
             document.getElementById('btn-tab-dashboard').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
             document.getElementById('btn-tab-ledger').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
+            document.getElementById('btn-tab-expenses').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
             document.getElementById('btn-tab-distribution').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
+            document.getElementById('btn-tab-reports').className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-slate-500 hover:text-emerald-600 hover:bg-slate-50";
 
             document.getElementById(`tab-${tabId}-content`).classList.remove('hidden');
             document.getElementById(`btn-tab-${tabId}`).className = "flex items-center gap-2 px-6 py-4 font-bold transition-colors whitespace-nowrap text-emerald-700 border-b-2 border-emerald-700 bg-emerald-50/50";
@@ -1059,6 +1241,18 @@
             }
         };
 
+        window.toggleExpenseForm = function() {
+            const formBody = document.getElementById('expense-form-body');
+            const label = document.getElementById('expense-form-toggle-label');
+            if (formBody.classList.contains('hidden')) {
+                formBody.classList.remove('hidden');
+                label.textContent = 'إغلاق الاستمارة [-]';
+            } else {
+                formBody.classList.add('hidden');
+                label.textContent = 'فتح الاستمارة [+]';
+            }
+        };
+
         window.toggleFormWaterFields = function() {
             const type = document.getElementById('form-type').value;
             const falajContainer = document.getElementById('form-water-falaj-container');
@@ -1115,6 +1309,42 @@
             document.getElementById('form-hours').value = '';
         };
 
+        window.saveNewExpense = function() {
+            const amount = Number(document.getElementById('exp-amount').value);
+            const purpose = document.getElementById('exp-purpose').value;
+            const date = document.getElementById('exp-date').value;
+            const note = document.getElementById('exp-note').value.trim();
+
+            if (!amount || !purpose || !date) {
+                alert("يرجى تعبئة كافة الحقول الأساسية للمصروفات (المبلغ، الغرض، التاريخ)");
+                return;
+            }
+
+            const newId = state.expenses.length > 0 ? Math.max(...state.expenses.map(e => e.id)) + 1 : 1;
+            const newExpense = {
+                id: newId,
+                amount: amount,
+                purpose: purpose,
+                date: date,
+                note: note || '—'
+            };
+
+            state.expenses.push(newExpense);
+            render();
+            syncToCloud();
+            window.toggleExpenseForm();
+
+            // تنظيف الحقول
+            document.getElementById('exp-amount').value = '';
+            document.getElementById('exp-note').value = '';
+        };
+
+        window.deleteExpense = function(id) {
+            state.expenses = state.expenses.filter(e => e.id !== id);
+            render();
+            syncToCloud();
+        };
+
         window.updatePurposeName = function(id, val) {
             state.purposes = state.purposes.map(p => {
                 if (p.id === id) {
@@ -1148,6 +1378,188 @@
             state.purposes.push({ id: newId, name: 'مصرف جديد', percent: 0 });
             render();
             syncToCloud();
+        };
+
+        // ================= دوال إنشاء وطباعة التقارير (PDF) =================
+        window.generateAndPrintReport = function() {
+            const reportType = document.getElementById('report-type').value;
+            const reportYear = document.getElementById('report-year').value;
+            const printArea = document.getElementById('print-area');
+            
+            const today = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            let yearLabel = reportYear === 'all' ? 'جميع السنوات (تراكمي)' : `عام ${reportYear}`;
+
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="margin-bottom: 5px;">بسم الله الرحمن الرحيم</h2>
+                    <h1 style="font-size: 24px; margin-bottom: 5px;">لجنة أوقاف مساجد بلدة منال</h1>
+                    <h3 style="color: #475569; margin-bottom: 5px;">التقرير المالي - ${yearLabel}</h3>
+                    <p style="font-size: 12px; color: #64748b;">تاريخ الإصدار: ${today}</p>
+                </div>
+            `;
+
+            let calcRev = 0;
+            let calcExp = 0;
+
+            // 1. تقرير الإيرادات
+            if (reportType === 'all' || reportType === 'revenues') {
+                html += `<h3 style="border-bottom: 2px solid #0f766e; padding-bottom: 5px; color: #0f766e; margin-top: 30px;">سجل الإيرادات والآجارات المحصلة الفعلي</h3>`;
+                html += `<table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم الوقف</th>
+                                    <th>النوع</th>
+                                    <th>المستأجر</th>
+                                    <th>السنة المالية</th>
+                                    <th>المبلغ المحصل (ر.ع)</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                state.records.forEach(r => {
+                    if (r.payments) {
+                        for (const [year, isPaid] of Object.entries(r.payments)) {
+                            if (isPaid && (reportYear === 'all' || reportYear === year)) {
+                                const rentVal = Number(r.rent) || 0;
+                                calcRev += rentVal;
+                                html += `<tr>
+                                    <td>${r.name}</td>
+                                    <td>${r.type === 'land' ? 'عقار/أرض' : 'مياه'}</td>
+                                    <td>${r.tenant}</td>
+                                    <td>${year}</td>
+                                    <td style="font-weight: bold;">${rentVal}</td>
+                                </tr>`;
+                            }
+                        }
+                    }
+                });
+                
+                html += `</tbody>
+                         <tfoot>
+                            <tr style="background-color: #f1f5f9; font-weight: bold;">
+                                <td colspan="4" style="text-align: left;">الإجمالي المحصل:</td>
+                                <td style="color: #047857;">${calcRev} ر.ع</td>
+                            </tr>
+                         </tfoot>
+                       </table>`;
+            }
+
+            // 2. تقرير المصروفات
+            if (reportType === 'all' || reportType === 'expenses') {
+                html += `<h3 style="border-bottom: 2px solid #b91c1c; padding-bottom: 5px; color: #b91c1c; margin-top: 30px;">سجل المصروفات والمسحوبات الفعلي</h3>`;
+                html += `<table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>المصرف (الغرض)</th>
+                                    <th>البيان والملاحظات</th>
+                                    <th>المبلغ المسحوب (ر.ع)</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                const filteredExpenses = state.expenses.filter(e => {
+                    if (reportYear === 'all') return true;
+                    return e.date.startsWith(reportYear);
+                });
+
+                filteredExpenses.forEach(e => {
+                    const amt = Number(e.amount) || 0;
+                    calcExp += amt;
+                    html += `<tr>
+                        <td>${e.date}</td>
+                        <td>${e.purpose}</td>
+                        <td>${e.note}</td>
+                        <td style="font-weight: bold;">${amt}</td>
+                    </tr>`;
+                });
+
+                html += `</tbody>
+                         <tfoot>
+                            <tr style="background-color: #fef2f2; font-weight: bold;">
+                                <td colspan="3" style="text-align: left;">إجمالي المصروفات:</td>
+                                <td style="color: #b91c1c;">${calcExp} ر.ع</td>
+                            </tr>
+                         </tfoot>
+                       </table>`;
+            }
+
+            // 3. تقرير التوزيع (الصافي)
+            if (reportType === 'all' || reportType === 'distribution') {
+                // إذا لم يتم حساب الإيرادات والمصروفات أعلاه، نحسبها الآن للتقرير الخاص
+                if (reportType === 'distribution') {
+                    state.records.forEach(r => {
+                        if (r.payments) {
+                            for (const [year, isPaid] of Object.entries(r.payments)) {
+                                if (isPaid && (reportYear === 'all' || reportYear === year)) calcRev += (Number(r.rent) || 0);
+                            }
+                        }
+                    });
+                    state.expenses.forEach(e => {
+                        if (reportYear === 'all' || e.date.startsWith(reportYear)) calcExp += (Number(e.amount) || 0);
+                    });
+                }
+
+                const netBalance = calcRev - calcExp;
+
+                html += `<h3 style="border-bottom: 2px solid #0369a1; padding-bottom: 5px; color: #0369a1; margin-top: 30px;">بيان الرصيد الفعلي وحصص التوزيع</h3>`;
+                html += `<div style="background-color: #f0f9ff; padding: 15px; border: 1px solid #bae6fd; margin-bottom: 15px; font-weight: bold; border-radius: 5px;">
+                            الرصيد الفعلي المتاح (الإيرادات المحصلة - المصروفات): <span style="color: #0369a1; font-size: 18px;">${netBalance} ر.ع</span>
+                         </div>`;
+                
+                html += `<table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم المصرف / الغرض الشرعي</th>
+                                    <th>النسبة المعتمدة (%)</th>
+                                    <th>الحصة المالية المتاحة (ر.ع)</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                let checkTotalPercent = 0;
+                state.purposes.forEach(p => {
+                    checkTotalPercent += p.percent;
+                    const share = (netBalance * (p.percent / 100)).toFixed(2);
+                    html += `<tr>
+                        <td>${p.name}</td>
+                        <td>${p.percent}%</td>
+                        <td style="font-weight: bold; color: #0369a1;">${share}</td>
+                    </tr>`;
+                });
+
+                html += `</tbody>
+                         <tfoot>
+                            <tr style="background-color: #f1f5f9; font-weight: bold;">
+                                <td style="text-align: left;">الإجمالي:</td>
+                                <td>${checkTotalPercent}%</td>
+                                <td style="color: #0369a1;">${netBalance} ر.ع</td>
+                            </tr>
+                         </tfoot>
+                       </table>`;
+            }
+
+            // التوقيعات الختامية للتقرير
+            html += `
+                <div style="margin-top: 50px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="text-align: center; width: 45%;">
+                        <p style="font-weight: bold; margin-bottom: 30px;">المُعِدّ / المسؤول المالي</p>
+                        <p>الاسم: .......................................</p>
+                        <p>التوقيع: .......................................</p>
+                    </div>
+                    <div style="text-align: center; width: 45%;">
+                        <p style="font-weight: bold; margin-bottom: 30px;">اعتماد لجنة نظار الوقف</p>
+                        <p>الختم / التوقيع: .......................................</p>
+                    </div>
+                </div>
+            `;
+
+            printArea.innerHTML = html;
+            
+            // استدعاء نافذة الطباعة الافتراضية
+            setTimeout(() => {
+                window.print();
+            }, 200);
         };
 
     </script>
